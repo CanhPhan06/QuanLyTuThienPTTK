@@ -1,0 +1,43 @@
+# ============================================================
+#  .gitignore — Volunteer Management System
+# ============================================================
+
+# === Node.js / React ===
+node_modules/
+dist/
+.vite/
+*.local
+
+# === Rust / Cargo ===
+src-tauri/target/
+**/*.rs.bk
+
+# === Tauri ===
+src-tauri/gen/
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# === OS ===
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# === Environment ===
+.env
+.env.local
+.env.*.local
+
+# === Logs ===
+*.log
+npm-debug.log*
+
+# === Build artifacts ===
+*.exe
+*.msi
+*.dmg
+*.AppImage
