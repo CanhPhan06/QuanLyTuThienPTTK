@@ -1,0 +1,154 @@
+.proof-review-container {
+  padding: 24px;
+}
+
+.proof-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.proof-card {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.proof-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.proof-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.verified-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(76, 175, 80, 0.9);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+.proof-details {
+  flex-grow: 1;
+  margin-bottom: 16px;
+}
+
+.proof-tnv-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0D1B2A;
+  margin-bottom: 8px;
+}
+
+.proof-type {
+  font-size: 0.9rem;
+  color: #F58220;
+  margin-bottom: 4px;
+}
+
+.proof-date {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.custom-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.custom-modal {
+  background: #112233;
+  padding: 32px;
+  border-radius: 12px;
+  width: 400px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.custom-modal h2 {
+  margin-top: 0;
+  color: #F58220;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.custom-modal form label {
+  display: block;
+  margin-bottom: 8px;
+  color: #B0BEC5;
+  font-size: 0.95rem;
+}
+
+.custom-modal form input,
+.custom-modal form select {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #0D1B2A;
+  font-size: 1rem;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+.custom-modal form input:focus,
+.custom-modal form select:focus {
+  outline: none;
+  border-color: #F58220;
+  box-shadow: 0 0 0 3px rgba(245, 130, 32, 0.3);
+  background-color: white;
+}
+
+.cancel-btn {
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  padding: 8px 16px;
+  border: none;
+  background: #F58220;
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit-btn:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+.w-full { width: 100%; }
+.text-center { text-align: center; }
+.py-12 { padding-top: 3rem; padding-bottom: 3rem; }

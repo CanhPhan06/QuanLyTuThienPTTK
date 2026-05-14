@@ -1,0 +1,224 @@
+/* frontend/components/layout/AuthLayout.css */
+
+.auth-container {
+  min-height: 100vh;
+  width: 100vw;
+  background-image: url('../../assets/BackgroundLogin.webp');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.auth-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.auth-content-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.auth-branding {
+  text-align: center;
+  margin-top: 4vh;
+  margin-bottom: 6vh;
+}
+
+.auth-title {
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 2.2rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  margin: 0;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 20px;
+  box-shadow: 
+    0 24px 48px rgba(0, 0, 0, 0.2), 
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 440px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.glass-card.wide {
+  max-width: 700px;
+}
+
+.glass-card h1 {
+  color: #0D1B2A;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  font-size: 1.8rem;
+}
+
+/* Form Elements */
+.auth-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.auth-label {
+  color: #0D1B2A;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+  font-size: 0.95rem;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(13, 27, 42, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+  font-family: inherit;
+  font-size: 1rem;
+  color: #0D1B2A;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-input:focus {
+  border-color: #F58220;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(245, 130, 32, 0.2);
+}
+
+.auth-input::placeholder {
+  color: #a0aec0;
+}
+
+/* Password Input Wrapper */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper .auth-input {
+  padding-right: 2.5rem;
+}
+
+.password-input-wrapper .eye-icon {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  color: #6b7280;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hide default edge password reveal */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* Button Gradient */
+.gradient-btn {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #F58220 0%, #FF9F43 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 8px 16px rgba(245, 130, 32, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.gradient-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px rgba(245, 130, 32, 0.4);
+}
+
+.gradient-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 8px rgba(245, 130, 32, 0.3);
+}
+
+.gradient-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Links */
+.auth-links {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  margin-top: 1.5rem;
+}
+
+.auth-link {
+  color: #F58220;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.auth-link:hover {
+  color: #e0731a;
+  text-decoration: underline;
+}
+
+.auth-link-center {
+  display: block;
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+/* Grid Layout for Register Form */
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.auth-grid-full {
+  grid-column: span 2;
+}
+
+@media (max-width: 640px) {
+  .auth-grid {
+    grid-template-columns: 1fr;
+  }
+  .auth-grid-full {
+    grid-column: span 1;
+  }
+  .glass-card {
+    padding: 2rem 1.5rem;
+  }
+  .auth-title {
+    font-size: 1.6rem;
+  }
+}

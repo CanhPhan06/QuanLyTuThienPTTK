@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- FILE: 05_triggers_business.sql
 -- MUC DICH: Implement 9 Triggers theo yeu cau
 -- ============================================================
@@ -130,9 +130,12 @@ CREATE OR REPLACE TRIGGER TRG_KIEMTRA_THOIGIAN
 BEFORE INSERT OR UPDATE ON ChienDich
 FOR EACH ROW
 BEGIN
-    IF :NEW.NgayBatDau < TRUNC(SYSDATE) THEN
-        RAISE_APPLICATION_ERROR(-20008, 'Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại.');
+    IF INSERTING OR (UPDATING AND :NEW.NgayBatDau != :OLD.NgayBatDau) THEN
+        IF :NEW.NgayBatDau < TRUNC(SYSDATE) THEN
+            RAISE_APPLICATION_ERROR(-20008, 'Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại.');
+        END IF;
     END IF;
+    
     IF :NEW.NgayKetThuc IS NOT NULL AND :NEW.NgayKetThuc < :NEW.NgayBatDau THEN
         RAISE_APPLICATION_ERROR(-20009, 'Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu.');
     END IF;

@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- FILE: 02_tables.sql
 -- MUC DICH: Tao tat ca BANG DU LIEU cho he thong quan ly hoat dong tinh nguyen
 -- CHAY SAU: 01_sequences.sql

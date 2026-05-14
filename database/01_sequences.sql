@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- FILE: 01_sequences.sql
 -- MUC DICH: Tao tat ca SEQUENCES cho he thong quan ly hoat dong tinh nguyen
 -- CHAY TRUOC: Tat ca cac file khac

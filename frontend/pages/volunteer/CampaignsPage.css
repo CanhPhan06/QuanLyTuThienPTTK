@@ -1,0 +1,166 @@
+.campaigns-page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+.campaigns-header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.campaigns-header h1 {
+  color: #0D1B2A;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.campaigns-header p {
+  color: #6b7280;
+  font-size: 1.15rem;
+}
+
+.campaign-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.campaign-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.campaign-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.campaign-card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(13, 27, 42, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.campaign-card-header h2 {
+  margin: 0;
+  color: #0D1B2A;
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.status-badge {
+  background-color: rgba(245, 130, 32, 0.15);
+  color: #F58220;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.campaign-card-body {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.campaign-desc {
+  color: #4b5563;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.campaign-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.campaign-meta span {
+  color: #0D1B2A;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.progress-section {
+  margin-top: auto;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.progress-bar-bg {
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F58220 0%, #FF9F43 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.campaign-card-footer {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(13, 27, 42, 0.1);
+}
+
+.enroll-btn {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #0D1B2A;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.enroll-btn:hover:not(:disabled) {
+  background-color: #1a2c42;
+}
+
+.enroll-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+  font-size: 1.2rem;
+}

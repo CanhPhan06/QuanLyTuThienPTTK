@@ -1,0 +1,11 @@
+/*
+ * Global Styles — Volunteer Management System
+ *
+ * Quy tắc:
+ * - File này chứa CSS global (reset, typography, variables)
+ * - CSS riêng cho component → tạo file .css cùng tên trong components/
+ * - Sử dụng CSS custom properties (--var) cho theme consistency
+ */
+
+@import './styles/theme.css';
+@import './styles/global.css';

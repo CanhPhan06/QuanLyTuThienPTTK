@@ -1,0 +1,60 @@
+.my-certificates-container {
+  padding: 24px;
+}
+
+.cert-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.my-cert-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.cert-thumbnail {
+  background-color: #0D1B2A;
+  background-image: radial-gradient(#F58220 1px, transparent 1px);
+  background-size: 15px 15px;
+  height: 150px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.cert-thumb-badge {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #F58220;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+}
+
+.cert-info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cert-info h3 {
+  margin: 0;
+  color: #0D1B2A;
+  font-size: 1.1rem;
+}
+
+.cert-info p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.cert-info button {
+  margin-top: 8px;
+  align-self: flex-start;
+}

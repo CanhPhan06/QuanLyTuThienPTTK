@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- FILE: 04_triggers_auto_pk.sql
 -- MUC DICH: Tao TRIGGERS tu dong gan Khoa Chinh tu SEQUENCES khi INSERT
 -- CHAY SAU: 03_indexes.sql

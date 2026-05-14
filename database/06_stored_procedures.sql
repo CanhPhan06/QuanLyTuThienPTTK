@@ -7,11 +7,15 @@
 CREATE OR REPLACE PROCEDURE SP_DANGKYTAIKHOAN_TNV (
     p_TenDN IN VARCHAR2,
     p_MK IN VARCHAR2,
+    p_Email IN VARCHAR2,
     p_HoTen IN NVARCHAR2,
     p_MSSV IN VARCHAR2,
+    p_NgaySinh IN DATE,
+    p_GioiTinh IN NVARCHAR2,
+    p_Khoa IN NVARCHAR2,
+    p_Lop IN NVARCHAR2,
     p_SDT IN VARCHAR2,
-    p_Email IN VARCHAR2,
-    p_Khoa IN NVARCHAR2
+    p_DiaChi IN NVARCHAR2
 )
 AS
     v_MaTK VARCHAR2(10);
@@ -21,7 +25,7 @@ BEGIN
     RETURNING MaTaiKhoan INTO v_MaTK;
     
     INSERT INTO HoSoSinhVien(MaHoSo, MaTaiKhoan, HoTen, MSSV, NgaySinh, GioiTinh, Khoa, Lop, SoDienThoai, DiaChi)
-    VALUES (NULL, v_MaTK, p_HoTen, p_MSSV, TO_DATE('2000-01-01', 'YYYY-MM-DD'), N'Khac', p_Khoa, 'Unknown', p_SDT, 'Unknown');
+    VALUES (NULL, v_MaTK, p_HoTen, p_MSSV, p_NgaySinh, p_GioiTinh, p_Khoa, p_Lop, p_SDT, p_DiaChi);
 END;
 /
 
@@ -112,12 +116,16 @@ CREATE OR REPLACE PROCEDURE SP_THEM_CHIENDICH_MOI (
     p_NgayBD IN DATE,
     p_NgayKT IN DATE,
     p_MoTa IN CLOB,
-    p_MaNguoiTao IN VARCHAR2
+    p_MaNguoiTao IN VARCHAR2,
+    p_DiaDiem IN NVARCHAR2,
+    p_SoLuongTNVToiDa IN NUMBER,
+    p_MaCD_Out OUT VARCHAR2
 )
 AS
 BEGIN
-    INSERT INTO ChienDich(MaChienDich, TenChienDich, NgayBatDau, NgayKetThuc, MoTa, MaNguoiTao)
-    VALUES (NULL, p_TenCD, p_NgayBD, p_NgayKT, p_MoTa, p_MaNguoiTao);
+    INSERT INTO ChienDich(MaChienDich, TenChienDich, NgayBatDau, NgayKetThuc, MoTa, DiaDiem, SoLuongTNVToiDa, MaNguoiTao, TrangThai)
+    VALUES (NULL, p_TenCD, p_NgayBD, p_NgayKT, p_MoTa, p_DiaDiem, p_SoLuongTNVToiDa, p_MaNguoiTao, 'DangHoatDong')
+    RETURNING MaChienDich INTO p_MaCD_Out;
 END;
 /
 

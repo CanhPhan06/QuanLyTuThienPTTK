@@ -1,4 +1,4 @@
--- ============================================================
+﻿-- ============================================================
 -- FILE: 03_indexes.sql
 -- MUC DICH: Tao tat ca INDEXES de toi uu hieu nang truy van
 -- CHAY SAU: 02_tables.sql

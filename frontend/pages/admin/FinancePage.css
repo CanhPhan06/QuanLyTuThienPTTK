@@ -1,0 +1,89 @@
+.finance-page-container {
+  padding: 24px;
+}
+
+.finance-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.finance-form .form-group {
+  margin-bottom: 16px;
+}
+
+.finance-form label {
+  display: block;
+  margin-bottom: 8px;
+  color: #4b5563;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.finance-form input,
+.finance-form select {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #0D1B2A;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.finance-form input:focus,
+.finance-form select:focus {
+  outline: none;
+  border-color: #F58220;
+  box-shadow: 0 0 0 3px rgba(245, 130, 32, 0.3);
+  background-color: white;
+}
+
+.action-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+  margin-top: 8px;
+}
+
+.success-btn {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+.success-btn:hover {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+}
+
+.danger-btn {
+  background: linear-gradient(135deg, #F44336, #e53935);
+}
+
+.danger-btn:hover {
+  background: linear-gradient(135deg, #e53935, #d32f2f);
+}
+
+.expense-amount {
+  font-weight: 600;
+  color: #F44336;
+}
+
+.mt-24 {
+  margin-top: 24px;
+}
+
+.proof-link {
+  color: #4CAF50;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.no-proof {
+  color: #B0BEC5;
+  font-style: italic;
+}
