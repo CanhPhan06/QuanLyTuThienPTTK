@@ -27,11 +27,11 @@ export const getParameters = async () => {
   return await response.json();
 };
 
-export const updateParameter = async (maTS, giaTriMoi) => {
+export const updateParameter = async (maTS, giaTriMoi, giaTriCu) => {
   const response = await fetch(`${API_URL}/parameters`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ maTS, giaTriMoi })
+    body: JSON.stringify({ maTS, giaTriMoi, giaTriCu })
   });
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));

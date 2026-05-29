@@ -56,12 +56,12 @@ const CampaignsPage = () => {
       />
       <div className="campaigns-page-container">
         <div className="campaigns-header">
-          <h1>Chiến Dịch Tình Nguyện</h1>
-          <p>Tham gia các hoạt động ý nghĩa và cống hiến sức trẻ cho cộng đồng.</p>
+          <h1>Hoạt động tình nguyện Maison Chance</h1>
+          <p>Đăng ký hỗ trợ các chương trình y tế, giáo dục, kho vận và chăm sóc thành viên.</p>
         </div>
 
         {loading ? (
-          <div className="loading-state">Đang tải danh sách chiến dịch...</div>
+          <div className="loading-state">Đang tải danh sách hoạt động...</div>
         ) : (
           <div className="campaign-grid">
             {campaigns.map(cd => {
@@ -82,8 +82,8 @@ const CampaignsPage = () => {
                   <div className="campaign-card-body">
                     <p className="campaign-desc">{cd.MOTA || cd.MoTa}</p>
                     <div className="campaign-meta">
-                      <span>📍 {cd.DIADIEM || cd.DiaDiem || "Chưa cập nhật"}</span>
-                      <span>📅 {startDate} - {endDate}</span>
+                      <span>Địa điểm: {cd.DIADIEM || cd.DiaDiem || "Chưa cập nhật"}</span>
+                      <span>Thời gian: {startDate} - {endDate}</span>
                     </div>
                     
                     <div className="progress-section">
@@ -110,7 +110,7 @@ const CampaignsPage = () => {
             })}
             
             {campaigns.length === 0 && (
-              <div className="empty-state">Hiện chưa có chiến dịch nào đang mở.</div>
+              <div className="empty-state">Hiện chưa có hoạt động nào đang mở.</div>
             )}
           </div>
         )}

@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 const dbConfig = {
   user: 'hqtcsdldb',
   password: 'hqtcsdl123',
-  connectString: 'localhost:1521/orcl'
+  connectString: 'localhost:1522/XE'
 };
 
 async function migrate(fileName) {

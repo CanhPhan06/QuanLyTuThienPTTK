@@ -36,12 +36,17 @@ const SystemConfigPage = () => {
 
   const handleSave = async () => {
     try {
-      await updateParameter(editingParam.MaThamSo || editingParam.MATHAMSO, newValue);
+      await updateParameter(
+        editingParam.MaThamSo || editingParam.MATHAMSO,
+        newValue,
+        editingParam.GiaTri || editingParam.GIATRI
+      );
       setModal({ isOpen: true, title: "Thành công", message: "Đã cập nhật tham số hệ thống.", type: "success" });
       setEditingParam(null);
       fetchParams();
     } catch (error) {
       setModal({ isOpen: true, title: "Lỗi", message: error.message, type: "error" });
+      fetchParams();
     }
   };
 
@@ -57,14 +62,14 @@ const SystemConfigPage = () => {
 
       <div className="config-container">
         <header className="config-header">
-          <h1>Cấu hình hệ thống</h1>
-          <p>Điều chỉnh các quy tắc và tham số hoạt động của ứng dụng</p>
+          <h1>Quy định & cảnh báo hệ thống</h1>
+          <p>Điều chỉnh tham số, quy tắc nghiệp vụ và ngưỡng cảnh báo của Maison Chance</p>
         </header>
 
         {loading ? (
           <div className="loading">Đang tải...</div>
         ) : (
-          <GlassCard title="Danh sách tham số">
+          <GlassCard title="Danh sách quy định/tham số">
             <div className="params-list">
               <table className="config-table">
                 <thead>

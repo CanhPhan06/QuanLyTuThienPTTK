@@ -57,13 +57,13 @@ const MyCertificatesPage = () => {
             <div className="cert-border-decor">
               <div className="cert-header">
                 <div className="cert-logos">
-                  <span className="logo-dt">HỆ THỐNG QUẢN LÝ HOẠT ĐỘNG TÌNH NGUYỆN</span>
+                  <span className="logo-dt">MAISON CHANCE</span>
                 </div>
                 <h2>GIẤY CHỨNG NHẬN</h2>
                 <p className="cert-subtitle">ELECTRONIC CERTIFICATE</p>
               </div>
               <div className="cert-body">
-                <p>Ban Quản Lý hoạt động Tình nguyện chứng nhận sinh viên:</p>
+                <p>Maison Chance chứng nhận tình nguyện viên:</p>
                 <h3 className="student-name">{previewCert.HOTEN || previewCert.HoTen}</h3>
                 <p className="student-info">MSSV: {previewCert.MSSV || previewCert.MASOSINHVIEN}</p>
                 
@@ -93,8 +93,8 @@ const MyCertificatesPage = () => {
 
       <div className="my-certificates-container">
         <div className="page-header">
-          <h1>Chứng Nhận Tình Nguyện</h1>
-          <p>Danh sách các giấy chứng nhận điện tử bạn đã đạt được.</p>
+          <h1>Chứng nhận Maison Chance</h1>
+          <p>Danh sách giấy chứng nhận điện tử sau khi hoàn thành hoạt động hỗ trợ.</p>
         </div>
 
         {loading ? (

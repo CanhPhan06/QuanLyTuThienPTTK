@@ -1,7 +1,7 @@
 {
-  "name": "volunteer-management-system",
+  "name": "maison-chance-volunteer-management",
   "version": "0.1.0",
-  "description": "Hệ Thống Quản Lý Hoạt Động Tình Nguyện Sinh Viên — Desktop App",
+  "description": "Hệ thống quản lý hoạt động tình nguyện Maison Chance — Desktop App",
   "private": true,
   "type": "module",
   "main": "main.js",

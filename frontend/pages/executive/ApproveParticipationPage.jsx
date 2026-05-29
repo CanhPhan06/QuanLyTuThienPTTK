@@ -32,11 +32,12 @@ const ApproveParticipationPage = () => {
 
   const handleApprove = async (id, status) => {
     try {
-      await approveEnrollment(id, status);
+      await approveEnrollment(id, status, enrollments.length);
       fetchEnrollments();
       setModal({ isOpen: true, title: "Thành công", message: `Đã ${status === 'DaDuyet' ? 'duyệt' : 'từ chối'} đơn đăng ký.`, type: "success" });
     } catch (error) {
       setModal({ isOpen: true, title: "Lỗi", message: error.message, type: "error" });
+      fetchEnrollments();
     }
   };
 
@@ -58,6 +59,7 @@ const ApproveParticipationPage = () => {
       setAssignModal({ isOpen: false, participant: null });
     } catch (error) {
       setModal({ isOpen: true, title: "Lỗi Phân Công", message: error.message, type: "error" });
+      fetchEnrollments();
     }
   };
 

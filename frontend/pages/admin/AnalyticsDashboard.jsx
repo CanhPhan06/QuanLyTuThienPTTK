@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import MainLayout from "../../components/layout/MainLayout";
 import GlassCard from "../../components/common/GlassCard";
+import SystemModal from "../../components/common/SystemModal";
 import { getCampaigns } from "../../services/campaigns";
 import { getCampaignStats, getTopVolunteers } from "../../services/statistics";
 import { 
@@ -30,6 +31,9 @@ const AnalyticsDashboard = () => {
   const [stats, setStats] = useState({ income: 0, expense: 0, weekly: [] });
   const [topTNV, setTopTNV] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dataVersion, setDataVersion] = useState("");
+  const [modal, setModal] = useState({ isOpen: false, title: "", message: "", type: "info" });
+  const dataVersionRef = useRef("");
 
   useEffect(() => {
     fetchInitialData();
@@ -39,6 +43,33 @@ const AnalyticsDashboard = () => {
     if (selectedCampaign) {
       fetchCampaignData(selectedCampaign);
     }
+  }, [selectedCampaign]);
+
+  useEffect(() => {
+    if (!selectedCampaign) return;
+
+    const intervalId = setInterval(() => {
+      fetchCampaignData(selectedCampaign, true);
+    }, 5000);
+
+    const handleFocus = () => {
+      fetchCampaignData(selectedCampaign, true);
+    };
+    const handleFinanceUpdate = (event) => {
+      if (event.key !== "finance-updated" || !event.newValue) return;
+      const payload = JSON.parse(event.newValue);
+      if (payload.campaignId === selectedCampaign) {
+        fetchCampaignData(selectedCampaign, true);
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("storage", handleFinanceUpdate);
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("storage", handleFinanceUpdate);
+    };
   }, [selectedCampaign]);
 
   const fetchInitialData = async () => {
@@ -55,12 +86,31 @@ const AnalyticsDashboard = () => {
     }
   };
 
-  const fetchCampaignData = async (id) => {
+  const fetchCampaignData = async (id, silent = false) => {
     try {
       const [s, top] = await Promise.all([
         getCampaignStats(id),
         getTopVolunteers(id)
       ]);
+      const nextVersion = JSON.stringify({ s, top });
+      if (dataVersionRef.current && nextVersion !== dataVersionRef.current && !silent) {
+        setModal({
+          isOpen: true,
+          title: "Dữ liệu đã thay đổi",
+          message: "Số liệu thống kê đã được người dùng khác cập nhật. Hệ thống đã tải lại dữ liệu mới để tránh sử dụng số liệu cũ.",
+          type: "warning"
+        });
+      }
+      if (dataVersionRef.current && nextVersion !== dataVersionRef.current && silent) {
+        setModal({
+          isOpen: true,
+          title: "Dữ liệu đã tự động cập nhật",
+          message: "Báo cáo thống kê vừa được đồng bộ với dữ liệu thu chi mới nhất.",
+          type: "success"
+        });
+      }
+      dataVersionRef.current = nextVersion;
+      setDataVersion(nextVersion);
       setStats(s || { income: 0, expense: 0, weekly: [] });
       setTopTNV(top || []);
     } catch (error) {
@@ -110,14 +160,21 @@ const AnalyticsDashboard = () => {
 
   return (
     <MainLayout>
+      <SystemModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+      />
       <div className="analytics-container">
         <header className="analytics-header">
           <div className="header-info">
-            <h1>Báo cáo & Thống kê</h1>
-            <p>Phân tích hiệu quả chiến dịch và vinh danh tình nguyện viên</p>
+            <h1>Đối soát & Báo cáo Maison Chance</h1>
+            <p>Theo dõi thu chi, số dư hoạt động và đóng góp của tình nguyện viên</p>
           </div>
           <div className="campaign-selector">
-            <label>Chọn chiến dịch:</label>
+            <label>Chọn hoạt động/dự án:</label>
             <select value={selectedCampaign} onChange={(e) => setSelectedCampaign(e.target.value)}>
               {campaigns.map(c => (
                 <option key={c.MaChienDich || c.MACHIENDICH} value={c.MaChienDich || c.MACHIENDICH}>
@@ -125,6 +182,9 @@ const AnalyticsDashboard = () => {
                 </option>
               ))}
             </select>
+            <button type="button" onClick={() => fetchCampaignData(selectedCampaign)}>
+              Tải lại
+            </button>
           </div>
         </header>
 
@@ -133,7 +193,7 @@ const AnalyticsDashboard = () => {
         ) : (
           <div className="analytics-grid">
             {/* Chart Section */}
-            <GlassCard title="Hiệu quả Tài chính" className="chart-card">
+            <GlassCard title="Hiệu quả tài chính" className="chart-card">
               <div className="chart-wrapper">
                 <Bar data={chartData} options={chartOptions} />
               </div>
@@ -148,7 +208,7 @@ const AnalyticsDashboard = () => {
             </GlassCard>
 
             {/* Hall of Fame */}
-            <GlassCard title="Bảng Vàng Tình Nguyện" className="hall-of-fame">
+            <GlassCard title="Tình nguyện viên nổi bật" className="hall-of-fame">
               <div className="top-tnv-list">
                 {topTNV.length > 0 ? (
                   topTNV.map((tnv, index) => (

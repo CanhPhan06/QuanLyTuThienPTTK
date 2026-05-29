@@ -1,4 +1,4 @@
-import { getConnection } from '../db.js';
+﻿import { getConnection } from '../db.js';
 import oracledb from 'oracledb';
 import fs from 'fs';
 import path from 'path';
@@ -7,41 +7,48 @@ export async function recordDonation(maTK, maCD, soTien, phuongThuc) {
   let connection;
   try {
     connection = await getConnection();
-    
-    // 1. Ghi nhận quyên góp qua Stored Procedure
-    await connection.execute(
-      `BEGIN SP_GHI_NHAN_QUYENGOP(:p_MaTK, :p_MaCD, :p_SoTien); END;`,
-      { p_MaTK: maTK, p_MaCD: maCD, p_SoTien: soTien }
-    );
-    
-    // 2. Lấy lại mã quyên góp vừa tạo
-    const qgResult = await connection.execute(
-      `SELECT MaQuyenGop FROM QuyenGopTien 
-       WHERE MaTaiKhoan = :maTK AND MaChienDich = :maCD AND SoTien = :soTien 
-       ORDER BY MaQuyenGop DESC FETCH FIRST 1 ROWS ONLY`,
-      { maTK, maCD, soTien },
+
+    const nextId = async (tableName, columnName, prefix) => {
+      const result = await connection.execute(
+        `SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(${columnName}, '[0-9]+$'))), 0) + 1 AS NEXT_ID
+         FROM ${tableName}
+         WHERE REGEXP_LIKE(${columnName}, '^${prefix}[0-9]+$')`,
+        {},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      return `${prefix}${String(result.rows[0].NEXT_ID).padStart(8, '0')}`;
+    };
+
+    const maQuyenGop = await nextId('QuyenGopTien', 'MaQuyenGop', 'QG');
+    const maThanhToan = await nextId('ThanhToan', 'MaThanhToan', 'TT');
+    const maGiaoDich = `TXN${Date.now()}`;
+
+    const campaignResult = await connection.execute(
+      `SELECT NgayBatDau, NgayKetThuc FROM ChienDich WHERE MaChienDich = :maCD`,
+      { maCD },
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
-    
-    if (qgResult.rows.length > 0) {
-      const maQuyenGop = qgResult.rows[0].MAQUYENGOP || qgResult.rows[0].MaQuyenGop;
-      
-      // 3. Cập nhật phương thức nếu cần (SP hardcode ChuyenKhoan)
-      if (phuongThuc && phuongThuc !== 'ChuyenKhoan') {
-        await connection.execute(
-          `UPDATE QuyenGopTien SET PhuongThuc = :phuongThuc WHERE MaQuyenGop = :maQuyenGop`,
-          { phuongThuc, maQuyenGop }
-        );
-      }
-      
-      // 4. Tạo record thanh toán
-      await connection.execute(
-        `INSERT INTO ThanhToan(MaThanhToan, MaQuyenGop, TrangThaiThanhToan, MaGiaoDichNganHang, NgayThanhToan)
-         VALUES ('TT' || LPAD(s_thanhtoan_id.NEXTVAL, 8, '0'), :maQuyenGop, 'ThanhCong', 'TXN' || ROUND(DBMS_RANDOM.VALUE(100000, 999999)), SYSDATE)`,
-        { maQuyenGop }
-      );
+    if (campaignResult.rows.length === 0) {
+      throw new Error('Không tìm thấy chiến dịch để ghi nhận quyên góp.');
     }
-    
+    const campaign = campaignResult.rows[0];
+    const startDate = campaign.NGAYBATDAU || campaign.NgayBatDau;
+    const endDate = campaign.NGAYKETTHUC || campaign.NgayKetThuc;
+    const now = new Date();
+    const ngayBaoCao = endDate && now > new Date(endDate) ? endDate : startDate;
+
+    await connection.execute(
+      `INSERT INTO QuyenGopTien(MaQuyenGop, MaTaiKhoan, MaChienDich, SoTien, NgayGiaoDich, PhuongThuc, LoiNhan)
+       VALUES (:maQuyenGop, :maTK, :maCD, :soTien, :ngayBaoCao, :phuongThuc, 'Ghi nhận từ màn hình tài trợ')`,
+      { maQuyenGop, maTK, maCD, soTien, ngayBaoCao, phuongThuc: phuongThuc || 'ChuyenKhoan' }
+    );
+
+    await connection.execute(
+      `INSERT INTO ThanhToan(MaThanhToan, MaQuyenGop, TrangThaiThanhToan, MaGiaoDichNganHang, NgayThanhToan)
+       VALUES (:maThanhToan, :maQuyenGop, 'ThanhCong', :maGiaoDich, :ngayBaoCao)`,
+      { maThanhToan, maQuyenGop, maGiaoDich, ngayBaoCao }
+    );
+
     await connection.commit();
     return true;
   } catch (error) {
@@ -51,7 +58,6 @@ export async function recordDonation(maTK, maCD, soTien, phuongThuc) {
     if (connection) await connection.close();
   }
 }
-
 export async function requestExpense(maCD, tenKhoanChi, soTien, mucDich, maNguoiChi, hinhAnhUrl) {
   let connection;
   try {

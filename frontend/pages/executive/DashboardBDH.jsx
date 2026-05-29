@@ -196,11 +196,11 @@ const DashboardBDH = () => {
       <div className="dashboard-bdh-container">
         <div className="central-workspace">
           <div className="dashboard-header">
-            <h1>Bảng Điều Hành: {context.campaign.TenChienDich || context.campaign.TENCHIENDICH}</h1>
+            <h1>Điều phối Maison Chance: {context.campaign.TenChienDich || context.campaign.TENCHIENDICH}</h1>
           </div>
 
           <div className="action-bar">
-            <button className="add-task-btn" onClick={() => setShowTaskForm(true)}>+ Thêm công việc</button>
+            <button className="add-task-btn" onClick={() => setShowTaskForm(true)}>+ Thêm công việc hỗ trợ</button>
           </div>
 
           <div className="glass-panel">

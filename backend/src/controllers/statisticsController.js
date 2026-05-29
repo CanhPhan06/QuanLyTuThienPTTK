@@ -58,13 +58,16 @@ router.get('/parameters', async (req, res) => {
 
 router.post('/parameters', async (req, res) => {
   try {
-    const { maTS, giaTriMoi } = req.body;
+    const { maTS, giaTriMoi, giaTriCu } = req.body;
     if (!maTS || !giaTriMoi) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-    await updateParameter(maTS, giaTriMoi);
+    await updateParameter(maTS, giaTriMoi, giaTriCu);
     res.json({ success: true, message: 'Đã cập nhật tham số thành công' });
   } catch (error) {
+    if (error.status === 409) {
+      return res.status(409).json({ error: error.message });
+    }
     if (error.message.includes('ORA-')) {
       res.status(400).json({ error: 'Lỗi CSDL: ' + error.message.split('\n')[0] });
     } else {

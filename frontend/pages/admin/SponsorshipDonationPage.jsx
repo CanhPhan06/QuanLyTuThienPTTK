@@ -77,6 +77,10 @@ const SponsorshipDonationPage = () => {
     e.preventDefault();
     try {
       await recordDonation(user.MaTaiKhoan, selectedCampaign, Number(moneyForm.amount), moneyForm.method, moneyForm.note);
+      localStorage.setItem(
+        "finance-updated",
+        JSON.stringify({ campaignId: selectedCampaign, time: Date.now() })
+      );
       setModal({ isOpen: true, title: "Thành công", message: "Đã ghi nhận đóng góp tiền.", type: "success" });
       setMoneyForm({ amount: "", method: "ChuyenKhoan", note: "" });
       fetchCampaignSpecificData(selectedCampaign);
@@ -110,11 +114,11 @@ const SponsorshipDonationPage = () => {
       <div className="sponsor-mgmt-container">
         <header className="page-header">
           <div className="header-info">
-            <h1>Tài trợ và Quyên góp</h1>
-            <p>Quản lý dòng tiền và vật phẩm từ các nhà hảo tâm</p>
+            <h1>Sổ vàng nhà hảo tâm Maison Chance</h1>
+            <p>Ghi nhận tiền mặt, chuyển khoản, hiện vật và phiếu xác nhận đóng góp</p>
           </div>
           <div className="campaign-selector-box">
-            <label>Chiến dịch:</label>
+            <label>Hoạt động/dự án:</label>
             <select value={selectedCampaign} onChange={(e) => setSelectedCampaign(e.target.value)}>
               {campaigns.map(c => (
                 <option key={c.MaChienDich || c.MACHIENDICH} value={c.MaChienDich || c.MACHIENDICH}>
@@ -167,7 +171,7 @@ const SponsorshipDonationPage = () => {
             {/* Row 3: Entry Forms */}
             <div className="pending-grid">
               {/* Money Entry */}
-              <GlassCard title="Nhập tài trợ & quyên góp tiền" className="pending-card">
+              <GlassCard title="Ghi sổ vàng đóng góp tiền" className="pending-card">
                 <form onSubmit={handleMoneySubmit} className="mgmt-form">
                   <div className="form-group">
                     <label>Số tiền (VNĐ)</label>
@@ -187,7 +191,7 @@ const SponsorshipDonationPage = () => {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Ghi chú / Người tài trợ</label>
+                    <label>Ghi chú / Nhà hảo tâm</label>
                     <input 
                       type="text" 
                       placeholder="VD: Cty ABC tài trợ 10tr"
@@ -195,12 +199,12 @@ const SponsorshipDonationPage = () => {
                       onChange={e => setMoneyForm({...moneyForm, note: e.target.value})}
                     />
                   </div>
-                  <button type="submit" className="submit-btn full-width">Ghi nhận ngân quỹ</button>
+                  <button type="submit" className="submit-btn full-width">Ghi sổ vàng</button>
                 </form>
               </GlassCard>
 
               {/* Item Entry */}
-              <GlassCard title="Nhập tài trợ & quyên góp vật phẩm" className="pending-card">
+              <GlassCard title="Ghi nhận đóng góp hiện vật" className="pending-card">
                 <form onSubmit={handleItemSubmit} className="mgmt-form">
                   <div className="form-group">
                     <label>Loại vật phẩm</label>

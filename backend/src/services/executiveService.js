@@ -61,10 +61,76 @@ export async function approveEnrollment(maThamGia, status) {
   }
 }
 
+export async function approveEnrollmentWithCheck(maThamGia, status, expectedCount) {
+  let connection;
+  try {
+    connection = await getConnection();
+
+    const info = await connection.execute(
+      `SELECT MaChienDich, TrangThaiDuyet FROM ThamGiaTNV WHERE MaThamGia = :maThamGia`,
+      { maThamGia },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (info.rows.length === 0) {
+      const error = new Error('Đơn đăng ký không còn tồn tại. Vui lòng tải lại danh sách.');
+      error.status = 409;
+      throw error;
+    }
+
+    const row = info.rows[0];
+    const maCD = row.MACHIENDICH || row.MaChienDich;
+    const currentStatus = row.TRANGTHAIDUYET || row.TrangThaiDuyet;
+
+    if (currentStatus !== 'ChoDuyet') {
+      const error = new Error('Đơn đăng ký đã được người dùng khác xử lý. Vui lòng tải lại danh sách.');
+      error.status = 409;
+      throw error;
+    }
+
+    if (expectedCount !== undefined && expectedCount !== null) {
+      const countResult = await connection.execute(
+        `SELECT COUNT(*) AS CNT FROM ThamGiaTNV WHERE MaChienDich = :maCD`,
+        { maCD },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      const currentCount = Number(countResult.rows[0]?.CNT || 0);
+      if (currentCount !== Number(expectedCount)) {
+        const error = new Error('Danh sách đăng ký đã thay đổi do người dùng khác thêm/xử lý dữ liệu. Vui lòng tải lại trước khi thao tác.');
+        error.status = 409;
+        throw error;
+      }
+    }
+
+    await connection.execute(
+      `BEGIN SP_DUYET_DANGKY_TNV(:p_MaThamGia, :p_TrangThaiMoi); END;`,
+      { p_MaThamGia: maThamGia, p_TrangThaiMoi: status }
+    );
+
+    await connection.commit();
+    return true;
+  } catch (error) {
+    if (connection) await connection.rollback();
+    throw error;
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+}
+
 export async function assignTask(maThamGia, maChienDich, tenNhiemVu, vaiTro) {
   let connection;
   try {
     connection = await getConnection();
+
+    await connection.execute(
+      `SELECT MaThamGia FROM ThamGiaTNV WHERE MaThamGia = :maThamGia FOR UPDATE NOWAIT`,
+      { maThamGia },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     
     // 1. Create or get task
     const taskResult = await connection.execute(
@@ -92,6 +158,11 @@ export async function assignTask(maThamGia, maChienDich, tenNhiemVu, vaiTro) {
     return true;
   } catch (error) {
     if (connection) await connection.rollback();
+    if (error.message?.includes('ORA-00054')) {
+      const lockError = new Error('Dữ liệu đang được người dùng khác thao tác. Hệ thống đã hủy phân công để tránh xung đột, vui lòng thử lại sau.');
+      lockError.status = 409;
+      throw lockError;
+    }
     throw error;
   } finally {
     if (connection) {

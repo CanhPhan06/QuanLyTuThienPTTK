@@ -7,7 +7,7 @@ oracledb.fetchAsString = [ oracledb.CLOB ];
 const dbConfig = {
   user: 'hqtcsdldb',
   password: 'hqtcsdl123',
-  connectString: 'localhost:1521/orcl' // Tweak as necessary
+  connectString: 'localhost:1522/XE' // Local Oracle XE listener/service
 };
 
 export async function getConnection() {

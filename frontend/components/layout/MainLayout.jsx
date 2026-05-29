@@ -21,30 +21,73 @@ const MainLayout = ({ children }) => {
     navigate("/login");
   };
 
+  const roleLabels = {
+    AdminKeToan: "Admin / Kế toán",
+    NhanVien: "Nhân viên",
+    BanDieuHanh: "Ban điều hành",
+    TinhNguyenVien: "Tình nguyện viên",
+    NhaTaiTro: "Nhà tài trợ",
+    BanQuanLy: "Admin / Kế toán"
+  };
+
   // Define sidebar menus based on role
   const menus = {
-    BanQuanLy: [
-      { label: "Quản trị tài khoản", path: "/admin/approve-volunteer" },
-      { label: "Tạo chiến dịch", path: "/admin/create-campaign" },
-      { label: "Tài trợ và Quyên góp", path: "/admin/finance" },
-      { label: "Cấp chứng nhận", path: "/admin/certification" },
-      { label: "Báo cáo thống kê", path: "/admin/analytics" },
-      { label: "Cấu hình hệ thống", path: "/admin/config" },
+    AdminKeToan: [
+      { label: "Bảng vận hành", path: "/operations" },
+      { label: "Sổ vàng nhà tài trợ", path: "/admin/donors" },
+      { label: "Phiếu chi & kiểm tra", path: "/admin/expense-approval" },
+      { label: "Đối soát báo cáo", path: "/admin/reconciliation" },
+      { label: "Cảnh báo nhắc việc", path: "/admin/alerts" },
+      { label: "Tài khoản & phân quyền", path: "/admin/approve-volunteer" },
+      { label: "Hồ sơ cá nhân", path: "/profile" },
+    ],
+    NhanVien: [
+      { label: "Bảng vận hành", path: "/operations" },
+      { label: "Hồ sơ & vãng gia", path: "/staff/case-intake" },
+      { label: "Đào tạo học nghề", path: "/staff/training" },
+      { label: "Kho & sản phẩm", path: "/staff/inventory" },
+      { label: "Lập phiếu chi", path: "/admin/expense-approval" },
+      { label: "Phân công TNV", path: "/staff/volunteer-assignment" },
+      { label: "Cảnh báo nhắc việc", path: "/admin/alerts" },
       { label: "Hồ sơ cá nhân", path: "/profile" },
     ],
     BanDieuHanh: [
-      { label: "Bảng Điều Hành", path: "/executive/dashboard" },
-      { label: "Duyệt tham gia CD", path: "/executive/approve-participation" },
-      { label: "Đánh giá TNV", path: "/executive/evaluation" },
-      { label: "Quản lý vật phẩm", path: "/executive/logistics" },
-      { label: "Tài chính & Ngân quỹ", path: "/executive/finance" },
+      { label: "Bảng vận hành", path: "/operations" },
+      { label: "Hội đồng xét duyệt", path: "/admin/council-review" },
+      { label: "Phê duyệt chi phí", path: "/admin/expense-approval" },
+      { label: "Điều phối TNV", path: "/staff/volunteer-assignment" },
+      { label: "Đối soát báo cáo", path: "/admin/reconciliation" },
+      { label: "Cảnh báo nhắc việc", path: "/admin/alerts" },
       { label: "Hồ sơ cá nhân", path: "/profile" },
     ],
     TinhNguyenVien: [
-      { label: "Dashboard", path: "/volunteer/dashboard" },
-      { label: "Đăng ký chiến dịch", path: "/volunteer/campaigns" },
-      { label: "Lịch sử hoạt động", path: "/volunteer/history" },
-      { label: "Chứng nhận của tôi", path: "/volunteer/certificates" },
+      { label: "Bảng vận hành", path: "/operations" },
+      { label: "Đăng ký hoạt động", path: "/volunteer/campaigns" },
+      { label: "Lịch sử hỗ trợ", path: "/volunteer/history" },
+      { label: "Chứng nhận Maison Chance", path: "/volunteer/certificates" },
+      { label: "Hồ sơ cá nhân", path: "/profile" },
+    ],
+    NhaTaiTro: [
+      { label: "Bảng vận hành", path: "/operations" },
+      { label: "Gửi đóng góp", path: "/admin/donors" },
+      { label: "Báo cáo minh bạch", path: "/admin/reconciliation" },
+      { label: "Hồ sơ cá nhân", path: "/profile" },
+    ],
+    BanQuanLy: [
+      { label: "Bảng vận hành", path: "/operations" },
+      { label: "Hội đồng xét duyệt", path: "/admin/council-review" },
+      { label: "Hồ sơ & vãng gia", path: "/staff/case-intake" },
+      { label: "Đào tạo học nghề", path: "/staff/training" },
+      { label: "Kho & sản phẩm", path: "/staff/inventory" },
+      { label: "Sổ vàng nhà hảo tâm", path: "/admin/donors" },
+      { label: "Phân công TNV", path: "/staff/volunteer-assignment" },
+      { label: "Thu chi & phê duyệt", path: "/admin/expense-approval" },
+      { label: "Đối soát báo cáo", path: "/admin/reconciliation" },
+      { label: "Cảnh báo nhắc việc", path: "/admin/alerts" },
+      { label: "Tài khoản & phân quyền", path: "/admin/approve-volunteer" },
+      { label: "Hoạt động & dự án", path: "/admin/create-campaign" },
+      { label: "Chứng nhận TNV", path: "/admin/certification" },
+      { label: "Quy định & cảnh báo", path: "/admin/config" },
       { label: "Hồ sơ cá nhân", path: "/profile" },
     ],
   };
@@ -55,8 +98,9 @@ const MainLayout = ({ children }) => {
     <div className="layout-container">
       <aside className="sidebar">
         <div className="sidebar-header">
-          <h2>HQTCSDL</h2>
+          <h2>Maison Chance</h2>
           <p>{user?.HoTen || user?.TenDangNhap || "Người dùng"}</p>
+          <span className="sidebar-role">{roleLabels[user?.VaiTro] || user?.VaiTro}</span>
         </div>
         <nav className="sidebar-nav">
           {currentMenu.map((item) => (
@@ -77,6 +121,10 @@ const MainLayout = ({ children }) => {
       </aside>
       <main className="main-content">
         <header className="top-header">
+          <div className="top-header-left">
+            <strong>{roleLabels[user?.VaiTro] || "Người dùng"}</strong>
+            <span>Luồng nghiệp vụ Maison Chance</span>
+          </div>
           <div className="top-header-right">
             <ThongBaoDropdown />
           </div>

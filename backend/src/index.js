@@ -21,6 +21,7 @@ import tnvRoutes from './controllers/tnvController.js';
 import bdhDashboardRoutes from './controllers/bdhDashboardController.js';
 import adminRoutes from './controllers/adminController.js';
 import adminFinanceRoutes from './controllers/adminFinanceController.js';
+import concurrencyDemoRoutes from './controllers/concurrencyDemoController.js';
 
 // Mount Routes
 app.use('/api/auth', authRoutes);
@@ -37,6 +38,7 @@ app.use('/api/tnv', tnvRoutes);
 app.use('/api/bdh', bdhDashboardRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin-finance', adminFinanceRoutes);
+app.use('/api/concurrency-demo', concurrencyDemoRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

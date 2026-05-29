@@ -10,11 +10,11 @@ export const getEnrollmentsForBDH = async (maTK) => {
   return response.json();
 };
 
-export const approveEnrollment = async (maThamGia, status) => {
+export const approveEnrollment = async (maThamGia, status, expectedCount) => {
   const response = await fetch(`${API_URL}/executive/enrollments/${maThamGia}/approve`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status })
+    body: JSON.stringify({ status, expectedCount })
   });
   const data = await response.json();
   if (!response.ok) {

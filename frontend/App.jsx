@@ -33,6 +33,26 @@ import TaskDetailPage from "./pages/executive/TaskDetailPage";
 import SponsorshipDonationPage from "./pages/admin/SponsorshipDonationPage";
 import SystemConfigPage from "./pages/admin/SystemConfigPage";
 import ExecutiveFinancePage from "./pages/executive/ExecutiveFinancePage";
+import ConcurrencyDemoPage from "./pages/admin/ConcurrencyDemoPage";
+import CaseIntakePage from "./pages/maison/CaseIntakePage";
+import CouncilReviewPage from "./pages/maison/CouncilReviewPage";
+import TrainingProgressPage from "./pages/maison/TrainingProgressPage";
+import InventoryMaterialsPage from "./pages/maison/InventoryMaterialsPage";
+import DonorLedgerPage from "./pages/maison/DonorLedgerPage";
+import VolunteerAssignmentPage from "./pages/maison/VolunteerAssignmentPage";
+import ExpenseApprovalPage from "./pages/maison/ExpenseApprovalPage";
+import ReconciliationReportPage from "./pages/maison/ReconciliationReportPage";
+import AlertsReminderPage from "./pages/maison/AlertsReminderPage";
+import OperationsHubPage from "./pages/maison/OperationsHubPage";
+
+const roleHome = {
+  AdminKeToan: "/operations",
+  NhanVien: "/operations",
+  BanDieuHanh: "/operations",
+  TinhNguyenVien: "/operations",
+  NhaTaiTro: "/operations",
+  BanQuanLy: "/operations"
+};
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useAuth();
@@ -43,12 +63,15 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   if (allowedRoles && !allowedRoles.includes(user.VaiTro)) {
     // If not allowed, send to appropriate default route based on role
-    if (user.VaiTro === "BanQuanLy") return <Navigate to="/admin/approve-volunteer" replace />;
-    if (user.VaiTro === "BanDieuHanh") return <Navigate to="/executive/dashboard" replace />;
-    return <Navigate to="/volunteer/dashboard" replace />;
+    return <Navigate to={roleHome[user.VaiTro] || "/operations"} replace />;
   }
 
   return children;
+};
+
+const HomeRedirect = () => {
+  const { user } = useAuth();
+  return <Navigate to={user ? (roleHome[user.VaiTro] || "/operations") : "/login"} replace />;
 };
 
 function App() {
@@ -72,35 +95,91 @@ function App() {
             </ProtectedRoute>
           } />
 
+          <Route path="/operations" element={
+            <ProtectedRoute allowedRoles={["AdminKeToan", "NhanVien", "BanDieuHanh", "TinhNguyenVien", "NhaTaiTro", "BanQuanLy"]}>
+              <OperationsHubPage />
+            </ProtectedRoute>
+          } />
+
           {/* Admin Routes */}
+          <Route path="/staff/case-intake" element={
+            <ProtectedRoute allowedRoles={["NhanVien", "BanDieuHanh", "AdminKeToan", "BanQuanLy"]}>
+              <CaseIntakePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/council-review" element={
+            <ProtectedRoute allowedRoles={["BanDieuHanh", "AdminKeToan", "BanQuanLy"]}>
+              <CouncilReviewPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/staff/training" element={
+            <ProtectedRoute allowedRoles={["NhanVien", "BanDieuHanh", "AdminKeToan", "BanQuanLy"]}>
+              <TrainingProgressPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/staff/inventory" element={
+            <ProtectedRoute allowedRoles={["NhanVien", "BanDieuHanh", "AdminKeToan", "BanQuanLy"]}>
+              <InventoryMaterialsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/donors" element={
+            <ProtectedRoute allowedRoles={["AdminKeToan", "NhaTaiTro", "BanQuanLy"]}>
+              <DonorLedgerPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/staff/volunteer-assignment" element={
+            <ProtectedRoute allowedRoles={["NhanVien", "BanDieuHanh", "TinhNguyenVien", "AdminKeToan", "BanQuanLy"]}>
+              <VolunteerAssignmentPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/expense-approval" element={
+            <ProtectedRoute allowedRoles={["NhanVien", "AdminKeToan", "BanDieuHanh", "BanQuanLy"]}>
+              <ExpenseApprovalPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/reconciliation" element={
+            <ProtectedRoute allowedRoles={["AdminKeToan", "BanDieuHanh", "NhaTaiTro", "BanQuanLy"]}>
+              <ReconciliationReportPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/alerts" element={
+            <ProtectedRoute allowedRoles={["NhanVien", "AdminKeToan", "BanDieuHanh", "BanQuanLy"]}>
+              <AlertsReminderPage />
+            </ProtectedRoute>
+          } />
           <Route path="/admin/approve-volunteer" element={
-            <ProtectedRoute allowedRoles={["BanQuanLy"]}>
+            <ProtectedRoute allowedRoles={["AdminKeToan", "BanQuanLy"]}>
               <ApproveVolunteerPage />
             </ProtectedRoute>
           } />
           <Route path="/admin/create-campaign" element={
-            <ProtectedRoute allowedRoles={["BanQuanLy"]}>
+            <ProtectedRoute allowedRoles={["AdminKeToan", "BanQuanLy"]}>
               <CreateCampaignPage />
             </ProtectedRoute>
           } />
           <Route path="/admin/finance" element={
-            <ProtectedRoute allowedRoles={["BanQuanLy"]}>
+            <ProtectedRoute allowedRoles={["AdminKeToan", "BanQuanLy"]}>
               <SponsorshipDonationPage />
             </ProtectedRoute>
           } />
           <Route path="/admin/certification" element={
-            <ProtectedRoute allowedRoles={["BanQuanLy"]}>
+            <ProtectedRoute allowedRoles={["AdminKeToan", "BanQuanLy"]}>
               <CertificationPage />
             </ProtectedRoute>
           } />
           <Route path="/admin/analytics" element={
-            <ProtectedRoute allowedRoles={["BanQuanLy"]}>
+            <ProtectedRoute allowedRoles={["AdminKeToan", "BanDieuHanh", "BanQuanLy"]}>
               <AnalyticsDashboard />
             </ProtectedRoute>
           } />
           <Route path="/admin/config" element={
-            <ProtectedRoute allowedRoles={["BanQuanLy"]}>
+            <ProtectedRoute allowedRoles={["AdminKeToan", "BanQuanLy"]}>
               <SystemConfigPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/concurrency-demo" element={
+            <ProtectedRoute allowedRoles={["AdminKeToan", "BanQuanLy"]}>
+              <ConcurrencyDemoPage />
             </ProtectedRoute>
           } />
 
@@ -179,7 +258,7 @@ function App() {
           } />
 
           {/* Default Route */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<HomeRedirect />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>

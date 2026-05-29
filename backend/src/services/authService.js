@@ -1,7 +1,76 @@
 import bcrypt from 'bcryptjs';
 import { getConnection } from '../db.js';
 
+const demoUsers = [
+  {
+    username: 'admin',
+    password: 'admin123',
+    MaTaiKhoan: 1,
+    TenDangNhap: 'admin',
+    VaiTro: 'AdminKeToan',
+    Email: 'admin@maisonchance.vn',
+    HoTen: 'Nguyễn Mai Anh',
+    ChucVu: 'Admin / Kế toán',
+    department: 'Tài chính - Quản trị'
+  },
+  {
+    username: 'nhanvien',
+    password: 'nhanvien123',
+    MaTaiKhoan: 2,
+    TenDangNhap: 'nhanvien',
+    VaiTro: 'NhanVien',
+    Email: 'nhanvien@maisonchance.vn',
+    HoTen: 'Lê Thu Hằng',
+    ChucVu: 'Nhân viên xã hội',
+    department: 'Công tác xã hội'
+  },
+  {
+    username: 'dieuhanh',
+    password: 'dieuhanh123',
+    MaTaiKhoan: 3,
+    TenDangNhap: 'dieuhanh',
+    VaiTro: 'BanDieuHanh',
+    Email: 'dieuhanh@maisonchance.vn',
+    HoTen: 'Trần Quốc Minh',
+    ChucVu: 'Ban điều hành',
+    department: 'Điều hành trung tâm'
+  },
+  {
+    username: 'tnv',
+    password: 'tnv123',
+    MaTaiKhoan: 4,
+    TenDangNhap: 'tnv',
+    VaiTro: 'TinhNguyenVien',
+    Email: 'tnv@maisonchance.vn',
+    HoTen: 'Lê Hoàng Nam',
+    ChucVu: 'Tình nguyện viên y tế',
+    linkedVolunteerId: 'TNV-002'
+  },
+  {
+    username: 'donor',
+    password: 'donor123',
+    MaTaiKhoan: 5,
+    TenDangNhap: 'donor',
+    VaiTro: 'NhaTaiTro',
+    Email: 'donor@maisonchance.vn',
+    HoTen: 'Công ty ABC',
+    ChucVu: 'Nhà tài trợ',
+    linkedDonorId: 'NHT-001'
+  }
+];
+
+const toSessionUser = (account) => {
+  const { password, username, ...user } = account;
+  return user;
+};
+
 export const loginUser = async (username, password) => {
+  const demoAccount = demoUsers.find((user) => user.username === username);
+  if (demoAccount) {
+    if (demoAccount.password === password) return toSessionUser(demoAccount);
+    throw new Error('Mật khẩu không chính xác.');
+  }
+
   let conn;
   try {
     conn = await getConnection();
@@ -96,6 +165,9 @@ export const registerUser = async (data) => {
 };
 
 export const verifyUser = async (username, email) => {
+  const demoAccount = demoUsers.find((user) => user.username === username && user.Email === email);
+  if (demoAccount) return true;
+
   let conn;
   try {
     conn = await getConnection();
@@ -114,6 +186,9 @@ export const verifyUser = async (username, email) => {
 };
 
 export const resetPassword = async (username, newPassword) => {
+  const demoAccount = demoUsers.find((user) => user.username === username);
+  if (demoAccount) return true;
+
   let conn;
   try {
     conn = await getConnection();
@@ -142,6 +217,20 @@ export const resetPassword = async (username, newPassword) => {
 };
 
 export const getProfile = async (username) => {
+  const demoAccount = demoUsers.find((user) => user.username === username);
+  if (demoAccount) {
+    return {
+      ...toSessionUser(demoAccount),
+      NgaySinh: '1998-01-01',
+      GioiTinh: 'Khac',
+      Khoa: demoAccount.department || '',
+      Lop: demoAccount.ChucVu || '',
+      SoDienThoai: '0900000000',
+      DiaChi: 'Maison Chance, TP.HCM',
+      success: true
+    };
+  }
+
   let conn;
   try {
     conn = await getConnection();
@@ -182,6 +271,9 @@ export const getProfile = async (username) => {
 };
 
 export const updateProfile = async (username, data) => {
+  const demoAccount = demoUsers.find((user) => user.username === username);
+  if (demoAccount) return true;
+
   let conn;
   try {
     conn = await getConnection();

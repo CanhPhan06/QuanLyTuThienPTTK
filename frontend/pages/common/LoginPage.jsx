@@ -1,10 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { login as loginApi } from "../../services/auth";
+import { DEMO_USERS, login as loginApi } from "../../services/auth";
 import SystemModal from "../../components/common/SystemModal";
 import AuthLayout from "../../components/layout/AuthLayout";
 import { EyeOpen, EyeClosed } from "../../components/common/EyeIcon";
+
+const roleHome = {
+  AdminKeToan: "/operations",
+  NhanVien: "/operations",
+  BanDieuHanh: "/operations",
+  TinhNguyenVien: "/operations",
+  NhaTaiTro: "/operations",
+  BanQuanLy: "/operations"
+};
 
 const LoginPage = () => {
   const [tenDangNhap, setTenDangNhap] = useState("");
@@ -21,9 +30,7 @@ const LoginPage = () => {
     try {
       const user = await loginApi(tenDangNhap, matKhau);
       login(user);
-      if (user.VaiTro === "BanQuanLy") navigate("/admin/approve-volunteer");
-      else if (user.VaiTro === "BanDieuHanh") navigate("/executive/dashboard");
-      else navigate("/volunteer/dashboard");
+      navigate(roleHome[user.VaiTro] || "/operations");
     } catch (error) {
       setModal({ isOpen: true, message: error });
     } finally {
@@ -32,7 +39,7 @@ const LoginPage = () => {
   };
 
   return (
-    <AuthLayout>
+    <AuthLayout wide>
       <SystemModal
         isOpen={modal.isOpen}
         title="Lỗi Đăng Nhập"
@@ -75,6 +82,24 @@ const LoginPage = () => {
         <button type="submit" disabled={loading} className="gradient-btn">
           {loading ? "Đang xử lý..." : "Đăng Nhập"}
         </button>
+        <div className="demo-login-panel">
+          <span>Tài khoản demo theo 5 vai trò</span>
+          <div className="demo-login-grid">
+            {DEMO_USERS.map((account) => (
+              <button
+                type="button"
+                key={account.username}
+                onClick={() => {
+                  setTenDangNhap(account.username);
+                  setMatKhau(account.password);
+                }}
+              >
+                <strong>{account.ChucVu}</strong>
+                <small>{account.username} / {account.password}</small>
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="auth-links">
           <Link to="/register" className="auth-link">Chưa có tài khoản?</Link>
           <Link to="/forgot-password" className="auth-link">Quên mật khẩu?</Link>

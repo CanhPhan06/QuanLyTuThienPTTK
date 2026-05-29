@@ -1,6 +1,76 @@
 const API_URL = 'http://localhost:3000/api';
 
+export const DEMO_USERS = [
+  {
+    username: 'admin',
+    password: 'admin123',
+    MaTaiKhoan: 1,
+    TenDangNhap: 'admin',
+    VaiTro: 'AdminKeToan',
+    Email: 'admin@maisonchance.vn',
+    HoTen: 'Nguyễn Mai Anh',
+    ChucVu: 'Admin / Kế toán',
+    department: 'Tài chính - Quản trị'
+  },
+  {
+    username: 'nhanvien',
+    password: 'nhanvien123',
+    MaTaiKhoan: 2,
+    TenDangNhap: 'nhanvien',
+    VaiTro: 'NhanVien',
+    Email: 'nhanvien@maisonchance.vn',
+    HoTen: 'Lê Thu Hằng',
+    ChucVu: 'Nhân viên xã hội',
+    department: 'Công tác xã hội'
+  },
+  {
+    username: 'dieuhanh',
+    password: 'dieuhanh123',
+    MaTaiKhoan: 3,
+    TenDangNhap: 'dieuhanh',
+    VaiTro: 'BanDieuHanh',
+    Email: 'dieuhanh@maisonchance.vn',
+    HoTen: 'Trần Quốc Minh',
+    ChucVu: 'Ban điều hành',
+    department: 'Điều hành trung tâm'
+  },
+  {
+    username: 'tnv',
+    password: 'tnv123',
+    MaTaiKhoan: 4,
+    TenDangNhap: 'tnv',
+    VaiTro: 'TinhNguyenVien',
+    Email: 'tnv@maisonchance.vn',
+    HoTen: 'Lê Hoàng Nam',
+    ChucVu: 'Tình nguyện viên y tế',
+    linkedVolunteerId: 'TNV-002'
+  },
+  {
+    username: 'donor',
+    password: 'donor123',
+    MaTaiKhoan: 5,
+    TenDangNhap: 'donor',
+    VaiTro: 'NhaTaiTro',
+    Email: 'donor@maisonchance.vn',
+    HoTen: 'Công ty ABC',
+    ChucVu: 'Nhà tài trợ',
+    linkedDonorId: 'NHT-001'
+  }
+];
+
+const toSessionUser = (account) => {
+  const { password, username, ...user } = account;
+  return user;
+};
+
+const findDemoAccount = (username, password) =>
+  DEMO_USERS.find((user) => user.username === username && user.password === password);
+
+const findDemoByUsername = (username) =>
+  DEMO_USERS.find((user) => user.username === username || user.TenDangNhap === username);
+
 export const login = async (username, password) => {
+  const demoAccount = findDemoAccount(username, password);
   try {
     const res = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
@@ -8,9 +78,13 @@ export const login = async (username, password) => {
       body: JSON.stringify({ username, password })
     });
     const data = await res.json();
-    if (!res.ok) throw data.error || 'Lỗi đăng nhập';
+    if (!res.ok) {
+      if (demoAccount) return toSessionUser(demoAccount);
+      throw data.error || 'Lỗi đăng nhập';
+    }
     return data;
   } catch (error) {
+    if (demoAccount) return toSessionUser(demoAccount);
     throw error.toString();
   }
 };
@@ -31,12 +105,17 @@ export const register = async (userData) => {
 };
 
 export const getProfile = async (username) => {
+  const demoAccount = findDemoByUsername(username);
   try {
     const res = await fetch(`${API_URL}/auth/profile/${username}`);
     const data = await res.json();
-    if (!res.ok) throw data.error || 'Lỗi tải hồ sơ';
+    if (!res.ok) {
+      if (demoAccount) return { ...toSessionUser(demoAccount), success: true };
+      throw data.error || 'Lỗi tải hồ sơ';
+    }
     return data;
   } catch (error) {
+    if (demoAccount) return { ...toSessionUser(demoAccount), success: true };
     throw error.toString();
   }
 };

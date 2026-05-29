@@ -176,13 +176,13 @@ const CertificationPage = () => {
             <div className="cert-border-decor">
               <div className="cert-header">
                 <div className="cert-logos">
-                  <span className="logo-dt">HỆ THỐNG QUẢN LÝ HOẠT ĐỘNG TÌNH NGUYỆN</span>
+                  <span className="logo-dt">MAISON CHANCE</span>
                 </div>
                 <h2>GIẤY CHỨNG NHẬN</h2>
                 <p className="cert-subtitle">ELECTRONIC CERTIFICATE</p>
               </div>
               <div className="cert-body">
-                <p>Ban Quản Lý hoạt động Tình nguyện chứng nhận sinh viên:</p>
+                <p>Maison Chance chứng nhận tình nguyện viên:</p>
                 <h3 className="student-name">{previewCert.HOTEN || previewCert.HoTen}</h3>
                 <p className="student-info">MSSV: {previewCert.MSSV || previewCert.MASOSINHVIEN}</p>
                 <div className="cert-main-text">

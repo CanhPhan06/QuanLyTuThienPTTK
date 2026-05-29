@@ -153,7 +153,20 @@ export const getParameters = async () => {
   return result.rows;
 };
 
-export const updateParameter = async (maTS, giaTriMoi) => {
+export const updateParameter = async (maTS, giaTriMoi, giaTriCu) => {
+  if (giaTriCu !== undefined && giaTriCu !== null) {
+    const current = await executeQuery(
+      `SELECT GiaTri FROM ThamSo WHERE MaThamSo = :maTS`,
+      { maTS }
+    );
+    const currentValue = String(current.rows[0]?.GIATRI ?? current.rows[0]?.GiaTri ?? '');
+    if (currentValue !== String(giaTriCu)) {
+      const error = new Error('Dữ liệu đã được người dùng khác cập nhật. Vui lòng tải lại trước khi chỉnh sửa.');
+      error.status = 409;
+      throw error;
+    }
+  }
+
   const sql = `
     BEGIN
       SP_THAYDOI_THAMSO(:maTS, :giaTriMoi);

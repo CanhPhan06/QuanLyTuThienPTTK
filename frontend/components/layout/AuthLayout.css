@@ -38,11 +38,12 @@
   color: #ffffff;
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: 2.2rem;
-  letter-spacing: 2px;
+  font-size: 1.9rem;
+  letter-spacing: 0;
   text-transform: uppercase;
   text-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
   margin: 0;
+  max-width: 920px;
 }
 
 /* Glassmorphism Card */
@@ -149,7 +150,7 @@ input[type="password"]::-ms-clear {
   font-weight: 600;
   font-size: 1.1rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0;
   box-shadow: 0 8px 16px rgba(245, 130, 32, 0.3);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
@@ -177,6 +178,53 @@ input[type="password"]::-ms-clear {
   justify-content: space-between;
   font-size: 0.9rem;
   margin-top: 1.5rem;
+}
+
+.demo-login-panel {
+  margin-top: 1rem;
+  border: 1px solid rgba(13, 27, 42, 0.12);
+  border-radius: 12px;
+  padding: 0.85rem;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.demo-login-panel > span {
+  display: block;
+  color: #0D1B2A;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.65rem;
+}
+
+.demo-login-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.demo-login-grid button {
+  border: 1px solid rgba(13, 27, 42, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  color: #0D1B2A;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-height: 64px;
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+}
+
+.demo-login-grid button:hover {
+  border-color: #F58220;
+  box-shadow: 0 6px 14px rgba(13, 27, 42, 0.08);
+}
+
+.demo-login-grid small {
+  color: #64748b;
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
 }
 
 .auth-link {
@@ -217,6 +265,9 @@ input[type="password"]::-ms-clear {
   }
   .glass-card {
     padding: 2rem 1.5rem;
+  }
+  .demo-login-grid {
+    grid-template-columns: 1fr;
   }
   .auth-title {
     font-size: 1.6rem;

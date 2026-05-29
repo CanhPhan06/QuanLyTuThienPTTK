@@ -48,7 +48,7 @@ const CreateCampaignPage = () => {
     setLoading(true);
     try {
       const res = await createCampaign({ ...formData, maBQL: user.MaTaiKhoan });
-      setModal({ isOpen: true, title: "Thành công", message: `Đã tạo chiến dịch. Mã CD: ${res.campaignId}`, type: "success" });
+      setModal({ isOpen: true, title: "Thành công", message: `Đã tạo hoạt động/dự án Maison Chance. Mã: ${res.campaignId}`, type: "success" });
       setFormData({
         tenChienDich: "",
         moTa: "",
@@ -59,7 +59,7 @@ const CreateCampaignPage = () => {
         maBDH: "TK00000003"
       });
     } catch (error) {
-      setModal({ isOpen: true, title: "Lỗi Tạo Chiến Dịch", message: error.message, type: "error" });
+      setModal({ isOpen: true, title: "Lỗi tạo hoạt động/dự án", message: error.message, type: "error" });
     } finally {
       setLoading(false);
     }
@@ -76,15 +76,15 @@ const CreateCampaignPage = () => {
       />
       <div className="campaign-create-container">
         <div className="campaign-header">
-          <h1>Tạo Chiến Dịch Mới</h1>
-          <p>Điền thông tin chi tiết để khởi tạo một chiến dịch tình nguyện mới.</p>
+          <h1>Tạo hoạt động/dự án Maison Chance</h1>
+          <p>Khởi tạo hoạt động hỗ trợ, gây quỹ hoặc chương trình tình nguyện của Maison Chance.</p>
         </div>
 
         <form className="glass-form" onSubmit={handleSubmit}>
           <div className="form-row">
             <div className="form-group full-width">
-              <label>Tên chiến dịch</label>
-              <input type="text" name="tenChienDich" value={formData.tenChienDich} onChange={handleChange} required placeholder="Nhập tên chiến dịch..." />
+              <label>Tên hoạt động/dự án</label>
+              <input type="text" name="tenChienDich" value={formData.tenChienDich} onChange={handleChange} required placeholder="VD: Hỗ trợ học nghề Maison Chance..." />
             </div>
           </div>
           
@@ -119,14 +119,14 @@ const CreateCampaignPage = () => {
               <input type="number" name="soLuongMax" value={formData.soLuongMax} onChange={handleChange} required min="1" />
             </div>
             <div className="form-group">
-              <label>Phân công Ban Điều Hành (Mã TK)</label>
+              <label>Phân công điều phối viên (Mã TK)</label>
               <input type="text" name="maBDH" value={formData.maBDH} onChange={handleChange} required placeholder="VD: TK00000003" />
             </div>
           </div>
 
           <div className="form-actions">
             <button type="submit" className="gradient-submit-btn" disabled={loading}>
-              {loading ? "Đang xử lý..." : "Tạo Chiến Dịch Mới"}
+              {loading ? "Đang xử lý..." : "Tạo hoạt động/dự án"}
             </button>
           </div>
         </form>
