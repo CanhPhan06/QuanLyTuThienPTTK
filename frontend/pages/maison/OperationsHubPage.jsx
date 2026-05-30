@@ -26,6 +26,15 @@ const detailTitles = {
   bankLine: "Chi tiết đối soát"
 };
 
+const workspaceTabs = [
+  { id: "requests", label: "Yêu cầu chờ xử lý" },
+  { id: "cases", label: "Hồ sơ" },
+  { id: "expenses", label: "Phiếu chi" },
+  { id: "donations", label: "Quyên góp" },
+  { id: "assignments", label: "Tình nguyện viên" },
+  { id: "operations", label: "Kho & đối soát" }
+];
+
 const statusClass = (status = "") => {
   if (["ChinhThuc", "DaPheDuyet", "DaXacNhan", "DaXacNhanTNV", "DaGhiSo", "Khop"].some((item) => status.includes(item)) || status.includes("Da ")) return "good";
   if (["TuChoi", "TuChoiChi", "TuChoiTNV", "TuChoiDongGop", "Chenh"].some((item) => status.includes(item)) || status.includes("Tu choi")) return "bad";
@@ -368,6 +377,7 @@ const OperationsHubPage = () => {
   const [data, setData] = useState(loadMaisonData);
   const [detail, setDetail] = useState(null);
   const [activeForm, setActiveForm] = useState(null);
+  const [activeWorkspace, setActiveWorkspace] = useState("requests");
   const [modal, setModal] = useState({ isOpen: false, title: "", message: "", type: "success" });
   const [caseForm, setCaseForm] = useState({
     name: "",
@@ -899,14 +909,20 @@ const OperationsHubPage = () => {
           </div>
         </header>
 
-        <section className="mc-kpi-grid">
-          <div className="mc-kpi"><strong>{kpis.waitingCases}</strong><span>Hồ sơ chờ hội đồng</span></div>
-          <div className="mc-kpi"><strong>{kpis.waitingAccounting}</strong><span>Phiếu chờ kế toán</span></div>
-          <div className="mc-kpi"><strong>{kpis.waitingDonations}</strong><span>Đóng góp chờ ghi sổ</span></div>
-          <div className="mc-kpi"><strong>{kpis.lowStock}</strong><span>Cảnh báo tồn kho</span></div>
-        </section>
+        <nav className="mc-workspace-tabs" aria-label="Phân hệ quản lý">
+          {workspaceTabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={activeWorkspace === tab.id ? "active" : ""}
+              type="button"
+              onClick={() => setActiveWorkspace(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
 
-        <section className="mc-card mc-request-inbox">
+        <section className="mc-card mc-request-inbox mc-list-panel" hidden={activeWorkspace !== "requests"}>
           <div className="mc-section-title">
             <div>
               <h2>Hộp yêu cầu chờ xử lý</h2>
@@ -938,7 +954,7 @@ const OperationsHubPage = () => {
 
         <div className="mc-ops-layout">
           <div className="mc-ops-main">
-            <section className="mc-card">
+            <section className="mc-card" hidden={activeWorkspace !== "cases"}>
               <div className="mc-section-title">
                 <div>
                   <h2>Tiếp nhận, vãng gia và xét duyệt hồ sơ</h2>
@@ -979,7 +995,7 @@ const OperationsHubPage = () => {
               </table>
             </section>
 
-            <section className="mc-card">
+            <section className="mc-card" hidden={activeWorkspace !== "expenses"}>
               <div className="mc-section-title">
                 <div>
                   <h2>Phiếu đề nghị chi và phê duyệt chi phí</h2>
@@ -1019,7 +1035,7 @@ const OperationsHubPage = () => {
               </table>
             </section>
 
-            <section className="mc-card">
+            <section className="mc-card" hidden={activeWorkspace !== "donations"}>
               <div className="mc-section-title">
                 <div>
                   <h2>Nhà tài trợ và sổ vàng đóng góp</h2>
@@ -1065,7 +1081,7 @@ const OperationsHubPage = () => {
               </table>
             </section>
 
-            <section className="mc-card">
+            <section className="mc-card" hidden={activeWorkspace !== "assignments"}>
               <div className="mc-section-title">
                 <div>
                   <h2>Điều phối tình nguyện viên</h2>
@@ -1104,7 +1120,7 @@ const OperationsHubPage = () => {
               </table>
             </section>
 
-            <section className="mc-grid">
+            <section className="mc-grid" hidden={activeWorkspace !== "operations"}>
               <div className="mc-card">
                 <div className="mc-section-title">
                   <div>
