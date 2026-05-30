@@ -10,7 +10,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "start:backend": "cd backend && npm start",
-    "start:electron": "wait-on tcp:5173 tcp:3000 && electron .",
+    "start:electron": "wait-on tcp:5173 tcp:3000 && electron . --dev",
     "dev:desktop": "concurrently \"npm run start:backend\" \"npm run dev\" \"npm run start:electron\""
   },
   "dependencies": {

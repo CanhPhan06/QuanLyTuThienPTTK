@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const isDev = process.argv.includes('--dev') || process.env.NODE_ENV === 'development' || !app.isPackaged;
+const isDev = process.argv.includes('--dev') || process.env.NODE_ENV === 'development';
 
 // Workaround for __dirname in ESM
 const __filename = fileURLToPath(import.meta.url);
