@@ -97,7 +97,10 @@
   border-radius: 6px;
   color: #475467;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
   font-weight: 800;
+  gap: 0.45rem;
   padding: 0.62rem 0.85rem;
   white-space: nowrap;
 }
@@ -105,6 +108,22 @@
 .mc-workspace-tabs button.active {
   background: #0d6b68;
   border-color: #0d6b68;
+  color: #fff;
+}
+
+.mc-workspace-tabs button span {
+  align-items: center;
+  background: rgba(13, 107, 104, 0.1);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.75rem;
+  justify-content: center;
+  min-width: 1.5rem;
+  padding: 0.12rem 0.42rem;
+}
+
+.mc-workspace-tabs button.active span {
+  background: rgba(255, 255, 255, 0.22);
   color: #fff;
 }
 

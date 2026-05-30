@@ -441,14 +441,6 @@ const OperationsHubPage = () => {
     [currentDonorId, data.donations, isDonor, user?.HoTen]
   );
 
-  const kpis = useMemo(() => ({
-    waitingCases: data.cases.filter((item) => item.status === "ChoHoiDong").length,
-    waitingAccounting: data.expenses.filter((item) => item.status === "ChoKeToan").length,
-    waitingExecutive: data.expenses.filter((item) => item.status === "ChoBGD").length,
-    waitingDonations: data.donations.filter((item) => item.status === "ChoKeToanXacNhan").length,
-    lowStock: data.inventory.materials.filter((item) => Number(item.stock) < Number(item.minStock)).length
-  }), [data]);
-
   const pendingRequests = useMemo(() => {
     const items = [];
     if (isAdmin) {
@@ -543,6 +535,15 @@ const OperationsHubPage = () => {
     }
     return items;
   }, [data, isAdmin, isDonor, isExecutive, isStaff, isVolunteer, user?.HoTen, visibleAssignments, visibleDonations]);
+
+  const workspaceCounts = {
+    requests: pendingRequests.length,
+    cases: data.cases.length,
+    expenses: data.expenses.length,
+    donations: visibleDonations.length,
+    assignments: visibleAssignments.length,
+    operations: data.inventory.materials.length + data.bankLines.length
+  };
 
   const persist = (nextData, nextDetail) => {
     setData(nextData);
@@ -918,6 +919,7 @@ const OperationsHubPage = () => {
               onClick={() => setActiveWorkspace(tab.id)}
             >
               {tab.label}
+              <span>{workspaceCounts[tab.id] || 0}</span>
             </button>
           ))}
         </nav>
@@ -961,21 +963,6 @@ const OperationsHubPage = () => {
                 </div>
                 {isStaff && <button className="mc-btn" type="button" onClick={() => setActiveForm("case")}>Thêm hồ sơ</button>}
               </div>
-              {false && isStaff && (
-                <form className="mc-form mc-inline-form" onSubmit={createCase}>
-                  <label>Họ tên đối tượng<input required value={caseForm.name} onChange={(e) => setCaseForm({ ...caseForm, name: e.target.value })} /></label>
-                  <label>Loại hồ sơ<select value={caseForm.type} onChange={(e) => setCaseForm({ ...caseForm, type: e.target.value })}><option>Trẻ em mồ côi</option><option>Người khuyết tật</option></select></label>
-                  <label>Ngày sinh<input type="date" required value={caseForm.birthDate} onChange={(e) => setCaseForm({ ...caseForm, birthDate: e.target.value })} /></label>
-                  <label>Số định danh<input required value={caseForm.identifier} onChange={(e) => setCaseForm({ ...caseForm, identifier: e.target.value })} /></label>
-                  <label className="mc-full">Hoàn cảnh gia đình<textarea required value={caseForm.family} onChange={(e) => setCaseForm({ ...caseForm, family: e.target.value })} /></label>
-                  <label>Địa chỉ vãng gia<input required value={caseForm.location} onChange={(e) => setCaseForm({ ...caseForm, location: e.target.value })} /></label>
-                  <label>Ngày vãng gia<input type="date" value={caseForm.visitDate} onChange={(e) => setCaseForm({ ...caseForm, visitDate: e.target.value })} /></label>
-                  <label className="mc-full">Lý do đề nghị xét duyệt<textarea required value={caseForm.requestReason} onChange={(e) => setCaseForm({ ...caseForm, requestReason: e.target.value })} placeholder="Vì sao hồ sơ này cần hội đồng xem xét?" /></label>
-                  <label className="mc-full">Kết quả vãng gia<textarea required value={caseForm.visitResult} onChange={(e) => setCaseForm({ ...caseForm, visitResult: e.target.value })} /></label>
-                  <label className="mc-full">Giấy tờ, minh chứng<input value={caseForm.documents} onChange={(e) => setCaseForm({ ...caseForm, documents: e.target.value })} /></label>
-                  <div className="mc-actions mc-full"><button className="mc-btn" type="submit">Gửi hội đồng xét duyệt</button></div>
-                </form>
-              )}
               <table className="mc-table">
                 <thead><tr><th>Hồ sơ</th><th>Người phụ trách</th><th>Trạng thái</th><th>Ghi chú</th><th>Thao tác</th></tr></thead>
                 <tbody>
@@ -1002,18 +989,6 @@ const OperationsHubPage = () => {
                 </div>
                 {isStaff && <button className="mc-btn" type="button" onClick={() => setActiveForm("expense")}>Lập phiếu chi</button>}
               </div>
-              {false && isStaff && (
-                <form className="mc-form mc-inline-form" onSubmit={createExpense}>
-                  <label className="mc-full">Nội dung chi<input required value={expenseForm.content} onChange={(e) => setExpenseForm({ ...expenseForm, content: e.target.value })} /></label>
-                  <label>Số tiền<input type="number" min="1000" value={expenseForm.amount} onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })} /></label>
-                  <label>Bộ phận<input value={expenseForm.department} onChange={(e) => setExpenseForm({ ...expenseForm, department: e.target.value })} /></label>
-                  <label className="mc-full">Lý do đề nghị chi<textarea required value={expenseForm.requestReason} onChange={(e) => setExpenseForm({ ...expenseForm, requestReason: e.target.value })} placeholder="Vì sao cần khoản chi này, tình hình thực tế là gì?" /></label>
-                  <label className="mc-full">Minh chứng<textarea value={expenseForm.evidence} placeholder="Nhập hóa đơn, báo giá, lý do hoặc ghi chú kiểm tra." onChange={(e) => setExpenseForm({ ...expenseForm, evidence: e.target.value })} /></label>
-                  <label>Ảnh minh chứng<input type="file" accept="image/*" onChange={(e) => attachEvidenceImage(e, setExpenseForm)} /></label>
-                  {expenseForm.evidenceImageName && <div className="mc-file-chip">{expenseForm.evidenceImageName}</div>}
-                  <div className="mc-actions mc-full"><button className="mc-btn" type="submit">Gửi yêu cầu cho kế toán</button></div>
-                </form>
-              )}
               <table className="mc-table">
                 <thead><tr><th>Phiếu</th><th>Người đề nghị</th><th>Số tiền</th><th>Trạng thái</th><th>Xử lý</th></tr></thead>
                 <tbody>
@@ -1042,22 +1017,6 @@ const OperationsHubPage = () => {
                 </div>
                 {isDonor && <button className="mc-btn" type="button" onClick={() => setActiveForm("donation")}>Gửi quyên góp</button>}
               </div>
-              {false && isDonor && (
-                <form className="mc-form mc-inline-form" onSubmit={createDonation}>
-                  <label>Nhà tài trợ<input required value={donationForm.donorName} onChange={(e) => setDonationForm({ ...donationForm, donorName: e.target.value })} /></label>
-                  <label>Lĩnh vực quan tâm<input value={donationForm.interest} onChange={(e) => setDonationForm({ ...donationForm, interest: e.target.value })} /></label>
-                  <label>Hình thức<select value={donationForm.kind} onChange={(e) => setDonationForm({ ...donationForm, kind: e.target.value })}><option>Chuyen khoan</option><option>Tien mat</option><option>Hien vat</option></select></label>
-                  <label>Giá trị quy đổi<input type="number" min="0" value={donationForm.amount} onChange={(e) => setDonationForm({ ...donationForm, amount: e.target.value })} /></label>
-                  <label>Tên hiện vật<input value={donationForm.itemName} onChange={(e) => setDonationForm({ ...donationForm, itemName: e.target.value })} /></label>
-                  <label>Số lượng<input value={donationForm.quantity} onChange={(e) => setDonationForm({ ...donationForm, quantity: e.target.value })} /></label>
-                  <label className="mc-full">Dự án muốn hỗ trợ<input value={donationForm.project} onChange={(e) => setDonationForm({ ...donationForm, project: e.target.value })} /></label>
-                  <label className="mc-full">Lý do / ghi chú quyên góp<textarea required value={donationForm.requestReason} onChange={(e) => setDonationForm({ ...donationForm, requestReason: e.target.value })} placeholder="Nhà tài trợ muốn hỗ trợ việc gì, có thông tin chuyển khoản/hiện vật gì cần kiểm tra?" /></label>
-                  <label className="mc-full">Minh chứng<textarea value={donationForm.evidence} onChange={(e) => setDonationForm({ ...donationForm, evidence: e.target.value })} placeholder="Nhập mã giao dịch, nội dung chuyển khoản hoặc ghi chú hiện vật." /></label>
-                  <label>Ảnh minh chứng<input type="file" accept="image/*" onChange={(e) => attachEvidenceImage(e, setDonationForm)} /></label>
-                  {donationForm.evidenceImageName && <div className="mc-file-chip">{donationForm.evidenceImageName}</div>}
-                  <div className="mc-actions mc-full"><button className="mc-btn" type="submit">Gửi yêu cầu quyên góp</button></div>
-                </form>
-              )}
               <table className="mc-table">
                 <thead><tr><th>Nhà tài trợ</th><th>Phiếu đóng góp</th><th>Giá trị</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
                 <tbody>
@@ -1088,16 +1047,6 @@ const OperationsHubPage = () => {
                 </div>
                 {(isStaff || isExecutive) && <button className="mc-btn" type="button" onClick={() => setActiveForm("assignment")}>Phân công</button>}
               </div>
-              {false && (isStaff || isExecutive) && (
-                <div className="mc-form mc-inline-form">
-                  <label>Kỹ năng cần tìm<select value={assignmentForm.skill} onChange={(e) => setAssignmentForm({ ...assignmentForm, skill: e.target.value })}><option>Y te</option><option>Su pham</option><option>Hau can</option><option>Truyen thong</option></select></label>
-                  <label>Tình nguyện viên<select value={assignmentForm.volunteerId} onChange={(e) => setAssignmentForm({ ...assignmentForm, volunteerId: e.target.value })}>{data.volunteers.map((item) => <option key={item.id} value={item.id}>{item.name} - {item.skill}</option>)}</select></label>
-                  <label className="mc-full">Công việc<input value={assignmentForm.task} onChange={(e) => setAssignmentForm({ ...assignmentForm, task: e.target.value })} /></label>
-                  <label>Thời gian<input type="datetime-local" value={assignmentForm.time} onChange={(e) => setAssignmentForm({ ...assignmentForm, time: e.target.value })} /></label>
-                  <label className="mc-full">Lý do phân công<textarea value={assignmentForm.requestReason} onChange={(e) => setAssignmentForm({ ...assignmentForm, requestReason: e.target.value })} placeholder="Vì sao cần tình nguyện viên này tham gia?" /></label>
-                  <div className="mc-actions"><button className="mc-btn" type="button" onClick={createAssignment}>Gửi lịch phân công</button></div>
-                </div>
-              )}
               <table className="mc-table">
                 <thead><tr><th>Tình nguyện viên</th><th>Công việc</th><th>Thời gian</th><th>Trạng thái</th><th>Phản hồi</th></tr></thead>
                 <tbody>
