@@ -71,7 +71,7 @@ const validateExpenseSubmitPayload = (expense) => {
 
 const validateCasePayload = (record) => {
   const errors = [];
-  const docs = (record.documents || []).join(" ").toLowerCase();
+  const docs = (Array.isArray(record.documents) ? record.documents.join(" ") : String(record.documents || "")).toLowerCase();
   if (!record.name?.trim()) errors.push("Thiếu họ tên đối tượng.");
   if (!record.identifier?.trim()) errors.push("Thiếu số định danh hồ sơ.");
   if (!record.family?.trim()) errors.push("Thiếu hoàn cảnh gia đình.");
@@ -546,8 +546,8 @@ const OperationsHubPage = () => {
   };
 
   const persist = (nextData, nextDetail) => {
-    setData(nextData);
-    saveMaisonData(nextData);
+    const savedData = saveMaisonData(nextData);
+    setData(savedData);
     if (nextDetail) setDetail(nextDetail);
   };
 
@@ -556,6 +556,10 @@ const OperationsHubPage = () => {
   };
 
   const openDetail = (type, item) => {
+    if (!item) {
+      showDone("Không tìm thấy dữ liệu", "Bản ghi này không còn tồn tại hoặc chưa được liên kết đúng.", "warning");
+      return;
+    }
     setDetail({ type, item });
   };
 

@@ -14,15 +14,16 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
-    title: "Quản Lý Hoạt Động Tình Nguyện Sinh Viên",
+    title: "Maison Chance - Quản lý hoạt động từ thiện",
+    backgroundColor: "#f6f8fb",
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true
     }
   });
 
-  const url = isDev 
-    ? 'http://localhost:5173' 
+  const url = isDev
+    ? 'http://127.0.0.1:5173'
     : `file://${path.join(__dirname, 'dist', 'index.html')}`;
 
   mainWindow.loadURL(url);

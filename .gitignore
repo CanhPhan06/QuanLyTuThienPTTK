@@ -6,6 +6,8 @@
 node_modules/
 dist/
 .vite/
+.edge-smoke/
+.edge-smoke-dist/
 *.local
 
 # === Rust / Cargo ===

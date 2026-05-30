@@ -30,11 +30,29 @@ cd ..
 
 ## Chay app desktop
 
+Chay ban dev co backend + frontend + Electron:
+
 ```bash
 npm run dev:desktop
 ```
 
 Lenh nay se chay backend, frontend va cua so Electron.
+
+Chay ban build da dong goi vao thu muc `dist`:
+
+```bash
+npm run build
+npm start
+```
+
+Kiem tra nhanh giao dien bang 5 tai khoan demo:
+
+```bash
+npm run dev
+npm run smoke:ui
+npm run build
+npm run smoke:electron
+```
 
 ## Database
 

@@ -1,5 +1,23 @@
 const STORAGE_KEY = "maison-chance-operations-v5";
 
+const clone = (value) => JSON.parse(JSON.stringify(value));
+const asArray = (value) => Array.isArray(value) ? value : [];
+const hasItems = (value) => Array.isArray(value) && value.length > 0;
+const asObject = (value) => value && typeof value === "object" && !Array.isArray(value) ? value : {};
+
+const normalizeDocuments = (documents) => {
+  if (Array.isArray(documents)) return documents.filter(Boolean);
+  return String(documents || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
+const withHistory = (item) => ({
+  ...asObject(item),
+  history: asArray(item?.history)
+});
+
 export const initialMaisonData = {
   cases: [
     {
@@ -110,46 +128,98 @@ export const initialMaisonData = {
 };
 
 export const statusLabels = {
-  ChoVangGia: "Cho vang gia",
-  CanBoSung: "Can bo sung",
-  ChoHoiDong: "Cho hoi dong",
-  ChinhThuc: "Thanh vien chinh thuc",
-  TuChoi: "Tu choi",
-  ChoKeToan: "Yeu cau moi - cho ke toan kiem tra",
-  ChoBGD: "Da ghi nhan - cho Ban dieu hanh duyet",
-  DaPheDuyet: "Da phe duyet",
-  TuChoiChi: "Tu choi",
-  CanChinhSua: "Can chinh sua",
-  ChoKeToanXacNhan: "Yeu cau moi - cho ke toan kiem tra",
-  DaGhiSo: "Da ghi so chinh thuc",
-  TuChoiDongGop: "Tu choi dong gop",
-  ChoNhapKho: "Da ghi so - cho kho nhap hien vat",
-  ChoXacNhan: "Cho xac nhan",
-  DaXacNhan: "Da xac nhan",
-  DaXacNhanTNV: "Da xac nhan",
-  TuChoiTNV: "Tu choi"
+  ChoVangGia: "Chờ vãng gia",
+  CanBoSung: "Cần bổ sung",
+  ChoHoiDong: "Chờ hội đồng",
+  ChinhThuc: "Thành viên chính thức",
+  TuChoi: "Từ chối",
+  ChoKeToan: "Yêu cầu mới - chờ kế toán kiểm tra",
+  ChoBGD: "Đã ghi nhận - chờ Ban điều hành duyệt",
+  DaPheDuyet: "Đã phê duyệt",
+  TuChoiChi: "Từ chối chi",
+  CanChinhSua: "Cần chỉnh sửa",
+  ChoKeToanXacNhan: "Yêu cầu mới - chờ kế toán kiểm tra",
+  DaGhiSo: "Đã ghi sổ chính thức",
+  TuChoiDongGop: "Từ chối đóng góp",
+  ChoNhapKho: "Đã ghi sổ - chờ kho nhập hiện vật",
+  ChoXacNhan: "Chờ xác nhận",
+  DaXacNhan: "Đã xác nhận",
+  DaXacNhanTNV: "Đã xác nhận",
+  TuChoiTNV: "Từ chối",
+  "Cho xac nhan": "Chờ xác nhận",
+  "Da xac nhan": "Đã xác nhận",
+  "Tu choi": "Từ chối",
+  Khop: "Khớp",
+  "Cho xac minh": "Chờ xác minh",
+  "Đã xử lý": "Đã xử lý",
+  "Sap den han": "Sắp đến hạn",
+  "Khan cap": "Khẩn cấp"
+};
+
+export const normalizeMaisonData = (value) => {
+  const base = clone(initialMaisonData);
+  const data = asObject(value);
+  const inventory = asObject(data.inventory);
+
+  return {
+    ...base,
+    ...data,
+    cases: hasItems(data.cases)
+      ? data.cases.map((item) => ({
+        ...withHistory(item),
+        documents: normalizeDocuments(item?.documents)
+      }))
+      : base.cases,
+    courses: hasItems(data.courses)
+      ? data.courses.map((item) => ({
+        ...asObject(item),
+        learners: asArray(item?.learners)
+      }))
+      : base.courses,
+    inventory: {
+      ...base.inventory,
+      ...inventory,
+      materials: hasItems(inventory.materials) ? inventory.materials.map(asObject) : base.inventory.materials,
+      products: hasItems(inventory.products) ? inventory.products.map(asObject) : base.inventory.products,
+      logs: hasItems(inventory.logs) ? inventory.logs.map(asObject) : base.inventory.logs
+    },
+    donors: hasItems(data.donors) ? data.donors.map(asObject) : base.donors,
+    donations: hasItems(data.donations) ? data.donations.map(withHistory) : base.donations,
+    volunteers: hasItems(data.volunteers) ? data.volunteers.map(asObject) : base.volunteers,
+    assignments: hasItems(data.assignments) ? data.assignments.map(withHistory) : base.assignments,
+    expenses: hasItems(data.expenses) ? data.expenses.map(withHistory) : base.expenses,
+    bankLines: hasItems(data.bankLines) ? data.bankLines.map(asObject) : base.bankLines,
+    reminders: hasItems(data.reminders) ? data.reminders.map(asObject) : base.reminders
+  };
 };
 
 export const loadMaisonData = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(initialMaisonData));
-      return initialMaisonData;
+      const freshData = normalizeMaisonData(initialMaisonData);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(freshData));
+      return freshData;
     }
-    return { ...initialMaisonData, ...JSON.parse(raw) };
+    const data = normalizeMaisonData(JSON.parse(raw));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    return data;
   } catch {
-    return initialMaisonData;
+    const fallback = normalizeMaisonData(initialMaisonData);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(fallback));
+    return fallback;
   }
 };
 
 export const saveMaisonData = (data) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  const normalizedData = normalizeMaisonData(data);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizedData));
   window.dispatchEvent(new Event("maison-data-updated"));
+  return normalizedData;
 };
 
 export const nextId = (prefix, collection, field = "id") => {
-  const max = collection.reduce((value, item) => {
+  const max = asArray(collection).reduce((value, item) => {
     const id = String(item[field] || "");
     const numeric = Number(id.replace(`${prefix}-`, ""));
     return Number.isFinite(numeric) ? Math.max(value, numeric) : value;

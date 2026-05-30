@@ -6,11 +6,14 @@
   "type": "module",
   "main": "main.js",
   "scripts": {
-    "dev": "vite",
+    "start": "electron .",
+    "dev": "vite --host 127.0.0.1",
     "build": "vite build",
+    "smoke:ui": "node tools/smoke-ui.mjs",
+    "smoke:electron": "electron tools/smoke-electron.mjs",
     "preview": "vite preview",
     "start:backend": "cd backend && npm start",
-    "start:electron": "wait-on tcp:5173 tcp:3000 && electron . --dev",
+    "start:electron": "wait-on tcp:127.0.0.1:5173 tcp:127.0.0.1:3000 && electron . --dev",
     "dev:desktop": "concurrently \"npm run start:backend\" \"npm run dev\" \"npm run start:electron\""
   },
   "dependencies": {

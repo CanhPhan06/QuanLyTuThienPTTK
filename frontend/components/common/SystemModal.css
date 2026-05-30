@@ -33,6 +33,7 @@
 .modal-message {
   margin-bottom: 2rem;
   color: var(--color-text-secondary);
+  white-space: pre-line;
 }
 
 .modal-btn {
