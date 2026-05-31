@@ -53,6 +53,15 @@ const run = async () => {
     `);
     await waitForText(window, ["Bảng xử lý yêu cầu", user.HoTen]);
     console.log(`OK ${user.VaiTro}`);
+
+    if (["AdminKeToan", "BanDieuHanh", "NhaTaiTro"].includes(user.VaiTro)) {
+      await window.webContents.executeJavaScript(`
+        location.hash = '/admin/reconciliation';
+        location.reload();
+      `);
+      await waitForText(window, ["Dashboard minh bạch", "Tài chính tổng hợp", user.HoTen]);
+      console.log(`OK report ${user.VaiTro}`);
+    }
   }
 
   window.close();

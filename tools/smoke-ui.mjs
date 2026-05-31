@@ -162,6 +162,16 @@ try {
     await browserClient.send("Runtime.evaluate", { expression, returnByValue: true }, sessionId);
     await waitForText(browserClient, sessionId, ["Bảng xử lý yêu cầu", user.HoTen]);
     console.log(`OK ${user.VaiTro}`);
+
+    if (["AdminKeToan", "BanDieuHanh", "NhaTaiTro"].includes(user.VaiTro)) {
+      const reportUrl = `${appUrl}/?smoke=${Date.now()}-${user.VaiTro}-report#/admin/reconciliation`;
+      await browserClient.send("Runtime.evaluate", {
+        expression: `location.href = ${JSON.stringify(reportUrl)};`,
+        returnByValue: true
+      }, sessionId);
+      await waitForText(browserClient, sessionId, ["Dashboard minh bạch", "Tài chính tổng hợp", user.HoTen]);
+      console.log(`OK report ${user.VaiTro}`);
+    }
   }
 
   browserClient.close();
