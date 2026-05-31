@@ -14,10 +14,10 @@ import { Bar, Line, Pie } from "react-chartjs-2";
 import MainLayout from "../../components/layout/MainLayout";
 import SystemModal from "../../components/common/SystemModal";
 import { useAuth } from "../../context/AuthContext";
-import { formatMoney, loadMaisonData, nextId, saveMaisonData, today } from "./maisonData";
+import { formatMoney, loadMaisonData, nextId, saveMaisonData, statusLabels, today } from "./maisonData";
 import "./MaisonWorkflow.css";
 
-const PIE_COLORS = ["#0d6b68", "#f58220", "#2f80ed", "#9b51e0", "#27ae60"];
+const PIE_COLORS = ["#0d6b68", "#f58220", "#2f80ed", "#9b51e0", "#27ae60", "#dc3545", "#64748b"];
 
 ChartJS.register(
   ArcElement,
@@ -37,6 +37,32 @@ const statusCount = (items, status) => items.filter((item) => item.status === st
 const sumAmount = (items) => items.reduce((sum, item) => sum + Number(item.amount || 0), 0);
 
 const chartMoney = (value) => `${Number(value || 0).toLocaleString("vi-VN")} đ`;
+const displayStatus = (status) => statusLabels[status] || status || "Chưa cập nhật";
+
+const groupBy = (items, getKey, getValue = () => 1) => Object.values(items.reduce((map, item) => {
+  const key = getKey(item) || "Chưa phân loại";
+  map[key] = map[key] || { name: key, value: 0 };
+  map[key].value += Number(getValue(item) || 0);
+  return map;
+}, {}));
+
+const findExpenseProject = (expense) => {
+  const text = `${expense.content || ""} ${expense.department || ""}`.toLowerCase();
+  if (text.includes("may") || text.includes("vải") || text.includes("vai")) return "Lop may can ban";
+  if (text.includes("khám") || text.includes("kham") || text.includes("y tế") || text.includes("y te")) return "Tai kham dinh ky";
+  if (text.includes("dinh duong") || text.includes("dinh dưỡng")) return "Dinh duong tre em";
+  return expense.department || "Vận hành chung";
+};
+
+const makeBarData = (labels, datasets) => ({ labels, datasets });
+
+const makePieData = (items) => ({
+  labels: items.map((item) => item.name),
+  datasets: [{
+    data: items.map((item) => item.value),
+    backgroundColor: items.map((item, index) => PIE_COLORS[index % PIE_COLORS.length])
+  }]
+});
 
 const ReconciliationReportPage = () => {
   const { user } = useAuth();
@@ -124,6 +150,64 @@ const ReconciliationReportPage = () => {
 
   const monthlyChart = Object.values(monthlySeries).sort((a, b) => a.month.localeCompare(b.month));
 
+  const projectMap = {};
+  data.donations.forEach((item) => {
+    const key = item.project || "Chưa phân loại";
+    projectMap[key] = projectMap[key] || { name: key, income: 0, expense: 0, donors: new Set(), records: 0 };
+    projectMap[key].income += Number(item.amount || 0);
+    projectMap[key].donors.add(item.donorName || item.donorId || "Ẩn danh");
+    projectMap[key].records += 1;
+  });
+  data.expenses.forEach((item) => {
+    const key = findExpenseProject(item);
+    projectMap[key] = projectMap[key] || { name: key, income: 0, expense: 0, donors: new Set(), records: 0 };
+    projectMap[key].expense += Number(item.amount || 0);
+  });
+  const projectStats = Object.values(projectMap)
+    .map((item) => ({
+      ...item,
+      donorCount: item.donors.size,
+      balance: item.income - item.expense
+    }))
+    .sort((a, b) => b.income - a.income);
+
+  const donorStats = data.donors.map((donor) => {
+    const donationTotal = data.donations
+      .filter((item) => item.donorId === donor.id || item.donorName === donor.name)
+      .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    return {
+      name: donor.name,
+      value: Math.max(Number(donor.total || 0), donationTotal),
+      donationCount: data.donations.filter((item) => item.donorId === donor.id || item.donorName === donor.name).length,
+      interest: donor.interest || "Chưa phân loại"
+    };
+  }).sort((a, b) => b.value - a.value);
+
+  const volunteerSkillStats = groupBy(data.volunteers, (item) => item.skill || "Chưa cập nhật");
+  const volunteerAvailabilityStats = groupBy(data.volunteers, (item) => item.availability || "Chưa cập nhật");
+  const assignmentStatusStats = groupBy(data.assignments, (item) => displayStatus(item.status));
+  const caseStatusStats = groupBy(data.cases, (item) => displayStatus(item.status));
+  const expenseStatusStats = groupBy(data.expenses, (item) => displayStatus(item.status), (item) => Number(item.amount || 0));
+  const donationStatusStats = groupBy(data.donations, (item) => displayStatus(item.status), (item) => Number(item.amount || 0));
+  const bankStatusStats = groupBy(data.bankLines, (item) => displayStatus(item.status));
+  const inventoryRiskStats = data.inventory.materials.map((item) => ({
+    name: item.name,
+    stock: Number(item.stock || 0),
+    minStock: Number(item.minStock || 0),
+    shortage: Math.max(0, Number(item.minStock || 0) - Number(item.stock || 0))
+  }));
+
+  const objectCoverageStats = [
+    { name: "Chiến dịch/Dự án", value: projectStats.length },
+    { name: "Hồ sơ", value: data.cases.length },
+    { name: "Nhà tài trợ", value: data.donors.length },
+    { name: "Quyên góp", value: data.donations.length },
+    { name: "Phiếu chi", value: data.expenses.length },
+    { name: "TNV", value: data.volunteers.length },
+    { name: "Kho", value: data.inventory.materials.length },
+    { name: "Sao kê", value: data.bankLines.length }
+  ];
+
   const moneyChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -157,6 +241,24 @@ const ReconciliationReportPage = () => {
     }
   };
 
+  const horizontalCountOptions = {
+    ...countChartOptions,
+    indexAxis: "y"
+  };
+
+  const horizontalMoneyOptions = {
+    ...moneyChartOptions,
+    indexAxis: "y",
+    plugins: {
+      legend: { position: "bottom" },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.dataset.label || context.label}: ${formatMoney(context.parsed?.x ?? context.raw)}`
+        }
+      }
+    }
+  };
+
   const pieChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -165,6 +267,19 @@ const ReconciliationReportPage = () => {
       tooltip: {
         callbacks: {
           label: (context) => `${context.label}: ${formatMoney(context.parsed)}`
+        }
+      }
+    }
+  };
+
+  const countPieOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: "bottom" },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.label}: ${context.parsed}`
         }
       }
     }
@@ -225,6 +340,69 @@ const ReconciliationReportPage = () => {
       backgroundColor: donationMix.map((item, index) => PIE_COLORS[index % PIE_COLORS.length])
     }]
   };
+
+  const projectPerformanceData = makeBarData(projectStats.map((item) => item.name), [
+    {
+      label: "Quyên góp",
+      data: projectStats.map((item) => item.income),
+      backgroundColor: "#0d6b68",
+      borderRadius: 6
+    },
+    {
+      label: "Chi phí",
+      data: projectStats.map((item) => item.expense),
+      backgroundColor: "#dc3545",
+      borderRadius: 6
+    }
+  ]);
+
+  const donorRankingData = makeBarData(donorStats.slice(0, 6).map((item) => item.name), [{
+    label: "Tổng đóng góp",
+    data: donorStats.slice(0, 6).map((item) => item.value),
+    backgroundColor: "#2f80ed",
+    borderRadius: 6
+  }]);
+
+  const volunteerSkillData = makeBarData(volunteerSkillStats.map((item) => item.name), [{
+    label: "Số tình nguyện viên",
+    data: volunteerSkillStats.map((item) => item.value),
+    backgroundColor: "#9b51e0",
+    borderRadius: 6
+  }]);
+
+  const volunteerAvailabilityData = makePieData(volunteerAvailabilityStats);
+  const assignmentStatusData = makePieData(assignmentStatusStats);
+  const caseStatusData = makePieData(caseStatusStats);
+  const expenseStatusData = makePieData(expenseStatusStats);
+  const donationStatusData = makePieData(donationStatusStats);
+  const bankStatusData = makePieData(bankStatusStats);
+  const objectCoverageData = makeBarData(objectCoverageStats.map((item) => item.name), [{
+    label: "Số bản ghi",
+    data: objectCoverageStats.map((item) => item.value),
+    backgroundColor: objectCoverageStats.map((item, index) => PIE_COLORS[index % PIE_COLORS.length]),
+    borderRadius: 6
+  }]);
+
+  const inventoryRiskData = makeBarData(inventoryRiskStats.map((item) => item.name), [
+    {
+      label: "Tồn kho",
+      data: inventoryRiskStats.map((item) => item.stock),
+      backgroundColor: "#0d6b68",
+      borderRadius: 6
+    },
+    {
+      label: "Định mức tối thiểu",
+      data: inventoryRiskStats.map((item) => item.minStock),
+      backgroundColor: "#f58220",
+      borderRadius: 6
+    },
+    {
+      label: "Thiếu hụt",
+      data: inventoryRiskStats.map((item) => item.shortage),
+      backgroundColor: "#dc3545",
+      borderRadius: 6
+    }
+  ]);
 
   const actorCards = [
     {
@@ -311,6 +489,12 @@ const ReconciliationReportPage = () => {
       `Yeu cau quyen gop cho ke toan,${report.pendingDonations.length}`,
       `Giao dich chenh lech,${report.bankMismatches.length}`,
       "",
+      "Du an,Quyen gop,Chi phi,So du,Nha tai tro",
+      ...projectStats.map((item) => `${item.name},${item.income},${item.expense},${item.balance},${item.donorCount}`),
+      "",
+      "Nha tai tro,Linh vuc,So khoan,Tong dong gop",
+      ...donorStats.map((item) => `${item.name},${item.interest},${item.donationCount},${item.value}`),
+      "",
       "Ma,Loai,Ten,So tien,Trang thai",
       ...data.donations.map((item) => `${item.id},Quyen gop,${item.donorName},${item.amount},${item.status}`),
       ...data.expenses.map((item) => `${item.id},Phieu chi,${item.content},${item.amount},${item.status}`)
@@ -388,6 +572,97 @@ const ReconciliationReportPage = () => {
           </div>
         </section>
 
+        <section className="report-section-heading">
+          <span>Đối tượng vận hành</span>
+          <h2>Thống kê theo chiến dịch, nhà tài trợ, tình nguyện viên và hồ sơ</h2>
+        </section>
+
+        <section className="report-chart-grid report-chart-grid-wide">
+          <div className="mc-card report-chart-card">
+            <h2>Hiệu quả chiến dịch / dự án</h2>
+            <div className="report-chart-canvas">
+              <Bar data={projectPerformanceData} options={moneyChartOptions} />
+            </div>
+          </div>
+
+          <div className="mc-card report-chart-card">
+            <h2>Top nhà tài trợ</h2>
+            <div className="report-chart-canvas">
+              <Bar data={donorRankingData} options={horizontalMoneyOptions} />
+            </div>
+          </div>
+
+          <div className="mc-card report-chart-card">
+            <h2>Tình nguyện viên theo kỹ năng</h2>
+            <div className="report-chart-canvas compact">
+              <Bar data={volunteerSkillData} options={countChartOptions} />
+            </div>
+          </div>
+
+          <div className="mc-card report-chart-card">
+            <h2>Lịch rảnh tình nguyện viên</h2>
+            <div className="report-chart-canvas compact">
+              <Pie data={volunteerAvailabilityData} options={countPieOptions} />
+            </div>
+          </div>
+
+          <div className="mc-card report-chart-card">
+            <h2>Trạng thái hồ sơ xã hội</h2>
+            <div className="report-chart-canvas compact">
+              <Pie data={caseStatusData} options={countPieOptions} />
+            </div>
+          </div>
+
+          <div className="mc-card report-chart-card">
+            <h2>Trạng thái phân công TNV</h2>
+            <div className="report-chart-canvas compact">
+              <Pie data={assignmentStatusData} options={countPieOptions} />
+            </div>
+          </div>
+        </section>
+
+        <section className="report-section-heading">
+          <span>Kiểm soát tài chính và rủi ro</span>
+          <h2>Quyên góp, phiếu chi, sao kê, kho và độ phủ dữ liệu</h2>
+        </section>
+
+        <section className="report-chart-grid report-chart-grid-wide">
+          <div className="mc-card report-chart-card">
+            <h2>Quyên góp theo trạng thái</h2>
+            <div className="report-chart-canvas compact">
+              <Pie data={donationStatusData} options={pieChartOptions} />
+            </div>
+          </div>
+
+          <div className="mc-card report-chart-card">
+            <h2>Phiếu chi theo trạng thái</h2>
+            <div className="report-chart-canvas compact">
+              <Pie data={expenseStatusData} options={pieChartOptions} />
+            </div>
+          </div>
+
+          <div className="mc-card report-chart-card">
+            <h2>Sao kê đối soát</h2>
+            <div className="report-chart-canvas compact">
+              <Pie data={bankStatusData} options={countPieOptions} />
+            </div>
+          </div>
+
+          <div className="mc-card report-chart-card">
+            <h2>Rủi ro tồn kho</h2>
+            <div className="report-chart-canvas compact">
+              <Bar data={inventoryRiskData} options={countChartOptions} />
+            </div>
+          </div>
+
+          <div className="mc-card report-chart-card report-span-2">
+            <h2>Độ phủ dữ liệu toàn hệ thống</h2>
+            <div className="report-chart-canvas compact">
+              <Bar data={objectCoverageData} options={horizontalCountOptions} />
+            </div>
+          </div>
+        </section>
+
         <section className="mc-card report-flow-card">
           <div className="mc-section-title">
             <div>
@@ -457,6 +732,42 @@ const ReconciliationReportPage = () => {
               ))}
             </tbody>
           </table>
+        </section>
+
+        <section className="mc-grid">
+          <div className="mc-card">
+            <h2>Bảng hiệu quả chiến dịch / dự án</h2>
+            <table className="mc-table">
+              <thead><tr><th>Dự án</th><th>Quyên góp</th><th>Chi phí</th><th>Số dư</th><th>Nhà tài trợ</th></tr></thead>
+              <tbody>
+                {projectStats.map((item) => (
+                  <tr key={item.name}>
+                    <td>{item.name}</td>
+                    <td>{formatMoney(item.income)}</td>
+                    <td>{formatMoney(item.expense)}</td>
+                    <td>{formatMoney(item.balance)}</td>
+                    <td>{item.donorCount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mc-card">
+            <h2>Bảng nhà tài trợ</h2>
+            <table className="mc-table">
+              <thead><tr><th>Nhà tài trợ</th><th>Lĩnh vực</th><th>Số khoản</th><th>Tổng đóng góp</th></tr></thead>
+              <tbody>
+                {donorStats.map((item) => (
+                  <tr key={item.name}>
+                    <td>{item.name}</td>
+                    <td>{item.interest}</td>
+                    <td>{item.donationCount}</td>
+                    <td>{formatMoney(item.value)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section className="mc-grid">
